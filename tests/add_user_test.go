@@ -1,14 +1,33 @@
 package main
 
 import (
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"reflect"
 	"strings"
 	"testing"
 
+	"gopkg.in/yaml.v2"
+
 	"user_management/handlers"
 )
+
+func readFile(filename string) ([]byte, error) {
+	file, err := os.Open(filename)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	data, err := io.ReadAll(file)
+	if err != nil {
+		return nil, err
+	}
+
+	return data, nil
+}
 
 func TestAddUserHandler(t *testing.T) {
 	// Create a temporary users.yaml file for testing
@@ -57,25 +76,20 @@ users:
 	}
 
 	// Assert that the new user is added to the users.yaml file
-	expectedData :=
-		`
-	users:
-	existinguser:
-		disabled: false
-		displayname: Existing User
-		password: existingpassword
-		email: existinguser@example.com
-		groups:
-		- group1
-	newuser:
-		disabled: false
-		displayname: New User
-		password: newpassword
-		email: newuser@example.com
-		groups:
-		- group2
-		`
-	if string(usersData) != expectedData {
-		t.Errorf("Expected users.yaml data:\n%s\n\nBut got:\n%s", expectedData, string(usersData))
+	expectedData, err := readFile("test_users.yaml")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var usersDataObj, expectedDataObj interface{}
+	if err := yaml.Unmarshal(usersData, &usersDataObj); err != nil {
+		t.Fatal(err)
+	}
+	if err := yaml.Unmarshal(expectedData, &expectedDataObj); err != nil {
+		t.Fatal(err)
+	}
+
+	if !reflect.DeepEqual(usersDataObj, expectedDataObj) {
+		t.Errorf("Expected users.yaml data:\n%v\n\nBut got:\n%v", expectedDataObj, usersDataObj)
 	}
 }

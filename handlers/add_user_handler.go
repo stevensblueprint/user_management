@@ -12,7 +12,7 @@ import (
 	"user_management/models"
 )
 
-func AddUserHandler(w http.ResponseWriter, r *http.Request) {
+func AddUserHandler(w http.ResponseWriter, r *http.Request, filePath string) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
@@ -25,18 +25,20 @@ func AddUserHandler(w http.ResponseWriter, r *http.Request) {
 	groups := strings.Split(r.FormValue("groups"), ",")
 
 	// Read the existing users.yaml file
-	usersFile, err := os.Open("users.yaml")
+	usersFile, err := os.OpenFile(filePath, os.O_RDWR, 0644)
 	if err != nil {
-		http.Error(w, "Failed to read users.yaml file", http.StatusInternalServerError)
+		http.Error(w, "Failed to open users.yaml file", http.StatusInternalServerError)
 		return
 	}
-	defer usersFile.Close()
 
-	usersData, err := io.ReadAll(usersFile)
+	var usersData []byte
+	usersData, err = io.ReadAll(usersFile)
 	if err != nil {
 		http.Error(w, "Failed to read users.yaml file", http.StatusInternalServerError)
 		return
 	}
+
+	defer usersFile.Close()
 
 	var users models.Users
 	err = yaml.Unmarshal(usersData, &users)
@@ -63,23 +65,31 @@ func AddUserHandler(w http.ResponseWriter, r *http.Request) {
 	// Add the new user to the users object
 	users.Users[username] = newUser
 
-	// Write the updated users object back to the users.yaml file
-	usersFile, err = os.Create("users.yaml")
+	// Convert the users object to a YAML string
+	usersYAML, err := yaml.Marshal(&users)
+	if err != nil {
+		http.Error(w, "Failed to convert users object to YAML", http.StatusInternalServerError)
+		return
+	}
+
+	// Reset the file pointer to the beginning of the file
+	_, err = usersFile.Seek(0, 0)
+	if err != nil {
+		http.Error(w, "Failed to seek to the beginning of the file", http.StatusInternalServerError)
+		return
+	}
+
+	// Write the YAML string to the users.yaml file
+	_, err = usersFile.Write(usersYAML)
 	if err != nil {
 		http.Error(w, "Failed to write users.yaml file", http.StatusInternalServerError)
 		return
 	}
-	defer usersFile.Close()
 
-	usersData, err = yaml.Marshal(&users)
+	// Truncate the file after the new data to remove any old data that might be left after the new data
+	err = usersFile.Truncate(int64(len(usersYAML)))
 	if err != nil {
-		http.Error(w, "Failed to marshal users data", http.StatusInternalServerError)
-		return
-	}
-
-	_, err = io.WriteString(usersFile, string(usersData))
-	if err != nil {
-		http.Error(w, "Failed to write users.yaml file", http.StatusInternalServerError)
+		http.Error(w, "Failed to truncate the file", http.StatusInternalServerError)
 		return
 	}
 

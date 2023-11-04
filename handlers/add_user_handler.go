@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -12,9 +13,24 @@ import (
 	"user_management/models"
 )
 
+type UserRequest struct {
+	Username    string   `json:"username"`
+	Password    string   `json:"password"`
+	Displayname string   `json:"displayname"`
+	Email       string   `json:"email"`
+	Groups      []string `json:"groups"`
+}
+
 func AddUserHandler(w http.ResponseWriter, r *http.Request, filePath string) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var userReq UserRequest
+	err := json.NewDecoder(r.Body).Decode(&userReq)
+	if err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
 

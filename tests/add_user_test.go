@@ -1,18 +1,27 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"reflect"
-	"strings"
 	"testing"
 
 	"gopkg.in/yaml.v2"
 
 	"user_management/handlers"
 )
+
+type UserRequest struct {
+	Username    string   `json:"username"`
+	Password    string   `json:"password"`
+	Displayname string   `json:"displayname"`
+	Email       string   `json:"email"`
+	Groups      []string `json:"groups"`
+}
 
 func readFile(filename string) ([]byte, error) {
 	file, err := os.Open(filename)
@@ -53,10 +62,25 @@ users:
 		t.Fatalf("Failed to write initial data to temporary file: %v", err)
 	}
 
-	// Create a test request with the required parameters
-	formData := strings.NewReader("username=newuser&password=newpassword&displayname=New+User&email=newuser@example.com&groups=group2")
-	req := httptest.NewRequest(http.MethodPost, "/add-user", formData)
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	// Create a test request JSON
+	userReq := UserRequest{
+		Username:    "newuser",
+		Password:    "newpassword",
+		Displayname: "New User",
+		Email:       "newuser@example.com",
+		Groups:      []string{"group1", "group2"},
+	}
+
+	jsonData, err := json.Marshal(userReq)
+	if err != nil {
+		t.Fatalf("Failed to marshal JSON: %v", err)
+	}
+
+	req, err := http.NewRequest("POST", "/adduser", bytes.NewBuffer(jsonData))
+	if err != nil {
+		t.Fatalf("Failed to create request: %v", err)
+	}
+	req.Header.Set("Content-Type", "application/json")
 
 	// Create a response recorder to capture the response
 	res := httptest.NewRecorder()

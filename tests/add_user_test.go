@@ -43,7 +43,7 @@ users:
 	res := httptest.NewRecorder()
 
 	// Call the addUserHandler function with the test request and response recorder
-	handlers.AddUserHandler(res, req)
+	handlers.AddUserHandler(res, req, tempFile.Name())
 
 	// Check the response status code
 	if res.Code != http.StatusOK {
@@ -57,23 +57,24 @@ users:
 	}
 
 	// Assert that the new user is added to the users.yaml file
-	expectedData := `
-users:
-  existinguser:
-    disabled: false
-    displayname: Existing User
-    password: existingpassword
-    email: existinguser@example.com
-    groups:
-    - group1
-  newuser:
-    disabled: false
-    displayname: New User
-    password: newpassword
-    email: newuser@example.com
-    groups:
-    - group2
-`
+	expectedData :=
+		`
+	users:
+	existinguser:
+		disabled: false
+		displayname: Existing User
+		password: existingpassword
+		email: existinguser@example.com
+		groups:
+		- group1
+	newuser:
+		disabled: false
+		displayname: New User
+		password: newpassword
+		email: newuser@example.com
+		groups:
+		- group2
+		`
 	if string(usersData) != expectedData {
 		t.Errorf("Expected users.yaml data:\n%s\n\nBut got:\n%s", expectedData, string(usersData))
 	}

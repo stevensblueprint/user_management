@@ -5,14 +5,14 @@ This project provides a user management system for the Blueprint Server.
 ## Installation
 
 1. Clone the repository:
-
-shell git clone https://github.com/your-username/user-management-system.git
-
+```
+git clone https://github.com/your-username/user-management-system.git
+```
 
 2. Build the project:
 
 ```
-shell go build
+go build
 ```
 
 ## Configuration

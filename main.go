@@ -8,14 +8,12 @@ import (
 )
 
 var PORT = ":3000"
+var PATH = "etc/users.yaml"
 
 func main() {
-	// Add the user.yaml file path
-	path := "etc/users.yaml"
-
 	// Set up the routes
 	http.HandleFunc("/add-user", func(w http.ResponseWriter, r *http.Request) {
-		handlers.AddUserHandler(w, r, path)
+		handlers.AddUserHandler(w, r, PATH)
 	})
 	http.Handle("/", http.FileServer(http.Dir("static")))
 

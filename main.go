@@ -7,6 +7,8 @@ import (
 	"user_management/handlers"
 )
 
+var PORT = ":3000"
+
 func main() {
 	// Add the user.yaml file path
 	path := "etc/users.yaml"
@@ -18,5 +20,5 @@ func main() {
 	http.Handle("/", http.FileServer(http.Dir("static")))
 
 	// Start the HTTP server
-	log.Fatal(http.ListenAndServe(":3000", nil))
+	log.Fatal(http.ListenAndServe(PORT, nil))
 }

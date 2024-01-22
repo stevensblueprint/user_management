@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
@@ -16,6 +17,12 @@ func main() {
 		handlers.AddUserHandler(w, r, PATH)
 	})
 	http.Handle("/", http.FileServer(http.Dir("static")))
+
+	// Health check
+	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		fmt.Fprint(w, "Server is Healthy")
+	})
 
 	// Start the HTTP server
 	log.Fatal(http.ListenAndServe(PORT, nil))

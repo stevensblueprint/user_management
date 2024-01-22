@@ -16,7 +16,6 @@ func main() {
 	http.HandleFunc("/add-user", func(w http.ResponseWriter, r *http.Request) {
 		handlers.AddUserHandler(w, r, PATH)
 	})
-	http.Handle("/", http.FileServer(http.Dir("static")))
 
 	// Health check
 	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {

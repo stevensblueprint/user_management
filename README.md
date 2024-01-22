@@ -15,7 +15,18 @@ git clone https://github.com/your-username/user-management-system.git
 go build
 ```
 
+3. To run the server
+```
+go run main.go
+```
+
 ## Configuration
+
+Make sure go is installed in your local. You can verify this by running
+```
+go version
+```
+If go is not installed, you can refer to this documentation to install it. https://go.dev/doc/install
 
 Install dependencies
 

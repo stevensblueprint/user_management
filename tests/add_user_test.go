@@ -28,7 +28,7 @@ func TestAddUserHandlerSuccess(t *testing.T) {
 
 	rr := httptest.NewRecorder()
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		handlers.AddUserHandler(w, r, "test_users.yaml") // Use a test file
+		handlers.AddUserHandler(w, r, "test_users.yaml")
 	})
 
 	// Call the handler

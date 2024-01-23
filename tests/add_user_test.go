@@ -5,11 +5,30 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 	"user_management/handlers"
 )
 
+func resetYAMLFile(filePath string) error {
+	initialState := `users:
+  existinguser:
+    disabled: false
+    displayname: Existing User
+    password: existingpassword
+    email: existinguser@example.com
+    groups:
+    - group1`
+	return os.WriteFile(filePath, []byte(initialState), 0644)
+}
+
 func TestAddUserHandlerSuccess(t *testing.T) {
+	// Reset the test_users.yaml file
+	err := resetYAMLFile("test_users.yaml")
+	if err != nil {
+		t.Fatalf("Failed to reset YAML file: %v", err)
+	}
+
 	// Setup request body
 	userReq := handlers.UserRequest{
 		Username:    "newuser",
@@ -46,6 +65,12 @@ func TestAddUserHandlerSuccess(t *testing.T) {
 }
 
 func TestAddUserHandlerInvalidMethod(t *testing.T) {
+	// Reset the test_users.yaml file
+	err := resetYAMLFile("test_users.yaml")
+	if err != nil {
+		t.Fatalf("Failed to reset YAML file: %v", err)
+	}
+
 	req, err := http.NewRequest("GET", "/adduser", nil)
 	if err != nil {
 		t.Fatal(err)

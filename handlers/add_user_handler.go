@@ -3,14 +3,11 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"os"
-	"strings"
+	"user_management/models"
 
 	"gopkg.in/yaml.v2"
-
-	"user_management/models"
 )
 
 type UserRequest struct {
@@ -34,27 +31,12 @@ func AddUserHandler(w http.ResponseWriter, r *http.Request, filePath string) {
 		return
 	}
 
-	username := r.FormValue("username")
-	password := r.FormValue("password")
-	displayname := r.FormValue("displayname")
-	email := r.FormValue("email")
-	groups := strings.Split(r.FormValue("groups"), ",")
-
 	// Read the existing users.yaml file
-	usersFile, err := os.OpenFile(filePath, os.O_RDWR, 0644)
+	usersData, err := os.ReadFile(filePath)
 	if err != nil {
 		http.Error(w, "Failed to open users.yaml file", http.StatusInternalServerError)
 		return
 	}
-
-	var usersData []byte
-	usersData, err = io.ReadAll(usersFile)
-	if err != nil {
-		http.Error(w, "Failed to read users.yaml file", http.StatusInternalServerError)
-		return
-	}
-
-	defer usersFile.Close()
 
 	var users models.Users
 	err = yaml.Unmarshal(usersData, &users)
@@ -64,7 +46,7 @@ func AddUserHandler(w http.ResponseWriter, r *http.Request, filePath string) {
 	}
 
 	// Check if the username already exists
-	if _, exists := users.Users[username]; exists {
+	if _, exists := users.Users[userReq.Username]; exists {
 		http.Error(w, "Username already exists", http.StatusBadRequest)
 		return
 	}
@@ -72,14 +54,14 @@ func AddUserHandler(w http.ResponseWriter, r *http.Request, filePath string) {
 	// Create a new user object
 	newUser := models.User{
 		Disabled:    false,
-		Displayname: displayname,
-		Password:    password,
-		Email:       email,
-		Groups:      groups,
+		Displayname: userReq.Displayname,
+		Password:    userReq.Password,
+		Email:       userReq.Email,
+		Groups:      userReq.Groups,
 	}
 
 	// Add the new user to the users object
-	users.Users[username] = newUser
+	users.Users[userReq.Username] = newUser
 
 	// Convert the users object to a YAML string
 	usersYAML, err := yaml.Marshal(&users)
@@ -88,24 +70,10 @@ func AddUserHandler(w http.ResponseWriter, r *http.Request, filePath string) {
 		return
 	}
 
-	// Reset the file pointer to the beginning of the file
-	_, err = usersFile.Seek(0, 0)
-	if err != nil {
-		http.Error(w, "Failed to seek to the beginning of the file", http.StatusInternalServerError)
-		return
-	}
-
 	// Write the YAML string to the users.yaml file
-	_, err = usersFile.Write(usersYAML)
+	err = os.WriteFile(filePath, usersYAML, 0644)
 	if err != nil {
 		http.Error(w, "Failed to write users.yaml file", http.StatusInternalServerError)
-		return
-	}
-
-	// Truncate the file after the new data to remove any old data that might be left after the new data
-	err = usersFile.Truncate(int64(len(usersYAML)))
-	if err != nil {
-		http.Error(w, "Failed to truncate the file", http.StatusInternalServerError)
 		return
 	}
 

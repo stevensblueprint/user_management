@@ -6,10 +6,3 @@ users:
     email: existinguser@example.com
     groups:
     - group1
-  newuser:
-    disabled: false
-    displayname: New User
-    password: newpassword
-    email: newuser@example.com
-    groups:
-    - group2

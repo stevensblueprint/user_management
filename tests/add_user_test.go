@@ -30,7 +30,7 @@ func TestAddUserHandlerSuccess(t *testing.T) {
 	}
 
 	// Setup request body
-	userReq := handlers.UserRequest{
+	userReq := handlers.AddUserRequest{
 		Username:    "newuser",
 		Password:    "password",
 		Displayname: "New User",

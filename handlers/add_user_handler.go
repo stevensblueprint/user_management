@@ -10,7 +10,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-type UserRequest struct {
+type AddUserRequest struct {
 	Username    string   `json:"username"`
 	Password    string   `json:"password"`
 	Displayname string   `json:"displayname"`
@@ -24,7 +24,7 @@ func AddUserHandler(w http.ResponseWriter, r *http.Request, filePath string) {
 		return
 	}
 
-	var userReq UserRequest
+	var userReq AddUserRequest
 	err := json.NewDecoder(r.Body).Decode(&userReq)
 	if err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)

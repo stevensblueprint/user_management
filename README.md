@@ -34,6 +34,12 @@ Install dependencies
 go mod download
 ```
 
+## Docs
+Available Endpoints
+``
+GET /api/v1/all
+``
+
 ## Contributing
 
 Contributions are welcome! If you would like to contribute to this project, please follow these guidelines:

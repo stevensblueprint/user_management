@@ -1,6 +1,11 @@
 # User Management System Blueprint Server
 
-This project provides a user management system for the Blueprint Server.
+## Description
+
+This project provides a user management system for the Blueprint Server. Stevens Blueprint uses Authelia as
+SSO application. Authelia provides a YAML file called users.yaml where all the authorized users are stored.
+This API intends to provide a way to manage the users.yaml. The API should provide endpoints to create, add,
+delete, update and disable users. The service will follow a RESTful API architecture. 
 
 ## Installation
 

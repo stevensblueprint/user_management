@@ -4,15 +4,26 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"user_management/handlers"
+
+	"github.com/joho/godotenv"
 )
 
 var PORT = ":3000"
-var PATH = "etc/users.yaml"
 var BASE_URL = "v1/users"
 
 func main() {
+
+	// Path to the users.yml file
+	errEnvVariables := godotenv.Load()
+	if errEnvVariables != nil {
+		log.Fatal("Error: Environment variable PATH not set")
+	}
+
+	PATH := os.Getenv("PATH")
+
 	// Set up the routes
 	http.HandleFunc(BASE_URL+"/user", func(w http.ResponseWriter, r *http.Request) {
 		// POST /v1/users/user

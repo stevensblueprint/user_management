@@ -31,7 +31,7 @@ func TestGetAllUsersHandlerSuccess(t *testing.T) {
 	}
 
 	// Check if the response body is the expected JSON (you'll need to define what you expect)
-	expected := `{"users": ... }` // JSON representation of the users
+	expected := `{"Users":{"existinguser":{"Disabled":false,"Displayname":"Existing User","Password":"existingpassword","Email":"existinguser@example.com","Groups":["group1"]}}}`
 	if rr.Body.String() != expected {
 		t.Errorf("handler returned unexpected body: got %v want %v", rr.Body.String(), expected)
 	}

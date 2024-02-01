@@ -63,6 +63,7 @@ Contributions are welcome! If you would like to contribute to this project, plea
 To run the tests for this project, use the following command:
 
 ```
+cd tests
 go test
 ```
 

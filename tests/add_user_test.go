@@ -5,22 +5,9 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"testing"
 	"user_management/handlers"
 )
-
-func resetYAMLFile(filePath string) error {
-	initialState := `users:
-  existinguser:
-    disabled: false
-    displayname: Existing User
-    password: existingpassword
-    email: existinguser@example.com
-    groups:
-    - group1`
-	return os.WriteFile(filePath, []byte(initialState), 0644)
-}
 
 func TestAddUserHandlerSuccess(t *testing.T) {
 	// Reset the test_users.yaml file

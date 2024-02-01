@@ -39,6 +39,23 @@ Install dependencies
 go mod download
 ```
 
+Add .env file
+
+Get the absolute PATH of your working directory. If you are using VSCode in the terminal run
+```
+pwd
+```
+Paste the output of the command in the .env file with the following format
+```
+PATH=(Output of pwd)
+```
+
+## Running the service
+Run
+```
+go run main.go
+```
+
 ## Docs
 Available Endpoints
 ``

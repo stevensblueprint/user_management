@@ -31,14 +31,12 @@ func main() {
 			handlers.AddUserHandler(w, r, PATH)
 		}
 
-		// Return 404 for all other methods
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-	})
+		if r.Method == http.MethodPut {
+			handlers.UpdateUserHandler(w, r, PATH)
+		}
 
-	http.HandleFunc(BASE_URL+"/user/disable", func(w http.ResponseWriter, r *http.Request) {
-		// POST /v1/users/user/disable
-		if r.Method == http.MethodPost {
-			handlers.DisableUserHandler(w, r, PATH)
+		if r.Method == http.MethodDelete {
+			handlers.DeleteUserHandler(w, r, PATH)
 		}
 
 		// Return 404 for all other methods
@@ -49,6 +47,26 @@ func main() {
 		// GET /v1/users/all
 		if r.Method == http.MethodGet {
 			handlers.GetAllUsersHandler(w, r, PATH)
+		}
+
+		// Return 404 for all other methods
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+	})
+
+	http.HandleFunc(BASE_URL+"/user/enable", func(w http.ResponseWriter, r *http.Request) {
+		// POST /v1/users/user/enable
+		if r.Method == http.MethodPost {
+			handlers.EnableUserRequestHandler(w, r, PATH)
+		}
+
+		// Return 404 for all other methods
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+	})
+
+	http.HandleFunc(BASE_URL+"/user/disable", func(w http.ResponseWriter, r *http.Request) {
+		// POST /v1/users/user/disable
+		if r.Method == http.MethodPost {
+			handlers.DisableUserHandler(w, r, PATH)
 		}
 
 		// Return 404 for all other methods

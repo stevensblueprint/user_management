@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"user_management/handlers"
+	"user_management/middleware"
 
 	"github.com/joho/godotenv"
 )
@@ -35,8 +36,10 @@ func main() {
 
 	PATH := os.Getenv("PATH")
 
+	mux := http.NewServeMux()
+
 	// Set up the routes
-	http.HandleFunc(BASE_URL+"/user", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(BASE_URL+"/user", func(w http.ResponseWriter, r *http.Request) {
 		// POST /v1/users/user
 		if r.Method == http.MethodPost {
 			handlers.AddUserHandler(w, r, PATH)
@@ -54,7 +57,7 @@ func main() {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 	})
 
-	http.HandleFunc(BASE_URL+"/all", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(BASE_URL+"/all", func(w http.ResponseWriter, r *http.Request) {
 		// GET /v1/users/all
 		if r.Method == http.MethodGet {
 			handlers.GetAllUsersHandler(w, r, PATH)
@@ -64,7 +67,7 @@ func main() {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 	})
 
-	http.HandleFunc(BASE_URL+"/user/enable", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(BASE_URL+"/user/enable", func(w http.ResponseWriter, r *http.Request) {
 		// POST /v1/users/user/enable
 		if r.Method == http.MethodPost {
 			handlers.EnableUserRequestHandler(w, r, PATH)
@@ -74,7 +77,7 @@ func main() {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 	})
 
-	http.HandleFunc(BASE_URL+"/user/disable", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(BASE_URL+"/user/disable", func(w http.ResponseWriter, r *http.Request) {
 		// POST /v1/users/user/disable
 		if r.Method == http.MethodPost {
 			handlers.DisableUserHandler(w, r, PATH)
@@ -85,11 +88,18 @@ func main() {
 	})
 
 	// Health check
-	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		fmt.Fprint(w, "Server is Healthy")
 	})
 
 	// Start the HTTP server
-	log.Fatal(http.ListenAndServe(PORT, nil))
+	wrapperMux := middleware.LoggingMiddleware(mux)
+
+	fmt.Printf("Server is running on port %s", PORT)
+
+	if err := http.ListenAndServe(PORT, wrapperMux); err != nil {
+		log.Fatalf("Error starting server: %s\n", err)
+	}
+
 }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
@@ -15,6 +16,16 @@ var PORT = ":3000"
 var BASE_URL = "v1/users"
 
 func main() {
+	fmt.Print("Starting the server...\n")
+	// Parse flags
+	var mode string
+	flag.StringVar(&mode, "mode", "prod", "Specify the running model the server should run in (dev, prod)")
+	flag.Parse()
+
+	if mode == "dev" {
+		fmt.Print("Running in dev mode\n")
+	}
+	fmt.Print("Running in prod mode\n")
 
 	// Path to the users.yml file
 	errEnvVariables := godotenv.Load()

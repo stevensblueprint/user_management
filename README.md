@@ -20,7 +20,7 @@ git clone https://github.com/your-username/user-management-system.git
 go build
 ```
 
-3. To run the server
+3. To run the server. Use the -dev flag to run the service in dev mode.
 ```
 go run main.go
 ```

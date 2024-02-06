@@ -38,6 +38,11 @@ func TestGetAllUsersHandlerSuccess(t *testing.T) {
 }
 
 func TestGetAllUsersHandlerInvalidMethod(t *testing.T) {
+	// Reset the test_users.yaml file
+	err := resetYAMLFile("test_users.yaml")
+	if err != nil {
+		t.Fatalf("Failed to reset YAML file: %v", err)
+	}
 	req, err := http.NewRequest("POST", "/users", nil)
 	if err != nil {
 		t.Fatal(err)

@@ -42,7 +42,7 @@ func TestDeleteUserHandlerSuccess(t *testing.T) {
 		t.Errorf("handler returned wrong status code: got %v want %v", status, http.StatusOK)
 	}
 
-	expected := "User deleted successfully"
+	expected := "User existinguser deleted successfully"
 	if rr.Body.String() != expected {
 		t.Errorf("handler returned unexpected body: got %v want %v", rr.Body.String(), expected)
 	}

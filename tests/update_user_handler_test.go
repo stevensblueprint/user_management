@@ -46,4 +46,10 @@ func TestUpdateUserHandlerSuccess(t *testing.T) {
 	if rr.Body.String() != expected {
 		t.Errorf("handler returned unexpected body: got %v want %v", rr.Body.String(), expected)
 	}
+
+	// Reset the yaml file
+	err = resetYAMLFile("test_users.yaml")
+	if err != nil {
+		t.Fatalf("Failed to reset YAML file: %v", err)
+	}
 }

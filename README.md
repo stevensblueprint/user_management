@@ -1,5 +1,7 @@
 # User Management System Blueprint Server
 
+![Blueprint](/static/logos/logo_banner.png)
+
 ## Description
 
 This project provides a user management system for the Blueprint Server. Stevens Blueprint uses Authelia as

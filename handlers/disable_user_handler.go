@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"os"
 	"user_management/models"
@@ -63,4 +64,6 @@ func DisableUserHandler(w http.ResponseWriter, r *http.Request, filePath string)
 		http.Error(w, "Failed to write users.yaml file", http.StatusInternalServerError)
 		return
 	}
+
+	fmt.Fprintf(w, "User disabled successfully")
 }

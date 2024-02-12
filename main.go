@@ -6,9 +6,10 @@ import (
 	"log"
 	"net/http"
 	"os"
-
 	"user_management/handlers"
 	"user_management/middleware"
+
+	"user_management/utils"
 
 	"github.com/joho/godotenv"
 )
@@ -28,7 +29,8 @@ func main() {
 
 	if dev {
 		fmt.Println("Running in dev mode")
-		PATH = "users.yml"
+		PATH = "users.yaml"
+		utils.ResetYAMLFile(PATH)
 	}
 	if prod {
 		fmt.Println("Running in prod mode")
@@ -105,7 +107,8 @@ func main() {
 	// Start the HTTP server
 	wrapperMux := middleware.LoggingMiddleware(mux)
 
-	fmt.Printf("Server is running on port %s", PORT)
+	// Ignore first char of PORT
+	fmt.Printf("Server is running on port %s", PORT[1:])
 
 	if err := http.ListenAndServe(PORT, wrapperMux); err != nil {
 		log.Fatalf("Error starting server: %s\n", err)

@@ -20,6 +20,7 @@ func main() {
 	// Parse flags
 	var dev bool
 	var prod bool
+	var PATH string
 
 	flag.BoolVar(&dev, "dev", false, "Run the server in development mode")
 	flag.BoolVar(&prod, "prod", false, "Run the server in production mode")
@@ -27,9 +28,11 @@ func main() {
 
 	if dev {
 		fmt.Println("Running in dev mode")
+		PATH = "users.yml"
 	}
 	if prod {
 		fmt.Println("Running in prod mode")
+		PATH = os.Getenv("PATH")
 	}
 	if !dev && !prod {
 		fmt.Println("Please specify a mode to run the server")
@@ -41,8 +44,6 @@ func main() {
 	if errEnvVariables != nil {
 		log.Fatal("Error: Environment variable PATH not set")
 	}
-
-	PATH := os.Getenv("PATH")
 
 	mux := http.NewServeMux()
 

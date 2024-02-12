@@ -26,31 +26,8 @@ go build
 ```
 go run main.go -dev
 ```
-
-## Configuration
-
-Make sure go is installed in your local. You can verify this by running
-```
-go version
-```
-If go is not installed, you can refer to this documentation to install it. https://go.dev/doc/install
-
-Install dependencies
-
-```
-go mod download
-```
-
-Add .env file
-
-Get the absolute PATH of your working directory. If you are using VSCode in the terminal run
-```
-pwd
-```
-Paste the output of the command in the .env file with the following format
-```
-PATH=(Output of pwd)
-```
+Note: If the server is running in dev mode, then the yaml file ```users.yaml``` in the root directory will be used.
+If the server is running in prod mode, then the path to the yaml file has to be specified in a ```.env``` file
 
 ## Running the service
 Run

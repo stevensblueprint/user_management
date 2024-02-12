@@ -24,7 +24,7 @@ go build
 
 3. To run the server. Use the -dev flag to run the service in dev mode.
 ```
-go run main.go
+go run main.go -dev
 ```
 
 ## Configuration

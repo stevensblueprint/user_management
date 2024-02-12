@@ -32,7 +32,7 @@ If the server is running in prod mode, then the path to the yaml file has to be 
 ## Running the service
 Run
 ```
-go run main.go
+go run main.go -dev
 ```
 
 ## Docs

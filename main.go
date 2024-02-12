@@ -13,20 +13,28 @@ import (
 	"github.com/joho/godotenv"
 )
 
-var PORT = ":3000"
+var PORT = ":8080"
 var BASE_URL = "v1/users"
 
 func main() {
-	fmt.Print("Starting the server...\n")
 	// Parse flags
-	var mode string
-	flag.StringVar(&mode, "mode", "prod", "Specify the running model the server should run in (dev, prod)")
+	var dev bool
+	var prod bool
+
+	flag.BoolVar(&dev, "dev", false, "Run the server in development mode")
+	flag.BoolVar(&prod, "prod", false, "Run the server in production mode")
 	flag.Parse()
 
-	if mode == "dev" {
-		fmt.Print("Running in dev mode\n")
+	if dev {
+		fmt.Println("Running in dev mode")
 	}
-	fmt.Print("Running in prod mode\n")
+	if prod {
+		fmt.Println("Running in prod mode")
+	}
+	if !dev && !prod {
+		fmt.Println("Please specify a mode to run the server")
+		os.Exit(1)
+	}
 
 	// Path to the users.yml file
 	errEnvVariables := godotenv.Load()

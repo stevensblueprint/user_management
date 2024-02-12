@@ -5,13 +5,12 @@ users:
     password: existingpassword
     email: user1@blueprint.com
     groups:
-    - admin
-    - dev
+      - admin
+      - dev
   user2:
     disabled: false
     displayname: Blueprint User 2
     password: existingpassword
     email: user2@blueprint.com
     groups:
-    - admin
-    
+      - admin

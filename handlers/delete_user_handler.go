@@ -15,6 +15,7 @@ type DeleteUserRequest struct {
 }
 
 func DeleteUserHandler(w http.ResponseWriter, r *http.Request, filePath string) {
+	// POST /v1/users/delete
 	if r.Method != http.MethodDelete {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return

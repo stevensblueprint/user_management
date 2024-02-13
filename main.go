@@ -15,7 +15,7 @@ import (
 )
 
 var PORT = ":8080"
-var BASE_URL = "v1/users"
+var BASE_URL = "/v1/users"
 
 func main() {
 	// Parse flags

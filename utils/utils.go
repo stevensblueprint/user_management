@@ -15,7 +15,7 @@ func ResetYAMLFile(filePath string) error {
       - admin
       - dev
   user2:
-    disabled: false
+    disabled: true
     displayname: Blueprint User 2
     password: existingpassword
     email: user2@blueprint.com

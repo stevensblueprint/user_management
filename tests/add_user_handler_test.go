@@ -21,8 +21,8 @@ func TestAddUserHandlerSuccess(t *testing.T) {
 		Username:    "newuser",
 		Password:    "password",
 		Displayname: "New User",
-		Email:       "example@blueprint.com",
-		Groups:      []string{"group1", "group2"},
+		Email:       "example@sitblueprint.com",
+		Groups:      []string{"dev", "admin"},
 	}
 	body, _ := json.Marshal(userReq)
 

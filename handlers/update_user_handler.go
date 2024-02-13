@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strings"
 	"user_management/models"
 
 	"gopkg.in/yaml.v2"
@@ -48,6 +49,14 @@ func UpdateUserHandler(w http.ResponseWriter, r *http.Request, filePath string) 
 	if _, exists := users.Users[userReq.Username]; !exists {
 		http.Error(w, "Username does not exist", http.StatusBadRequest)
 		return
+	}
+
+	// If email is updated, check if it ends with @sitblueprint.com or @stevens.edu
+	if userReq.Email != "" {
+		if !strings.HasSuffix(userReq.Email, "@sitblueprint.com") && !strings.HasSuffix(userReq.Email, "@stevens.edu") {
+			http.Error(w, "Invalid email domain", http.StatusBadRequest)
+			return
+		}
 	}
 
 	// Update the user object

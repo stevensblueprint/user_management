@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"crypto/rand"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -8,6 +10,7 @@ import (
 	"strings"
 	"user_management/models"
 
+	"golang.org/x/crypto/argon2"
 	"gopkg.in/yaml.v2"
 )
 
@@ -53,11 +56,18 @@ func AddUserHandler(w http.ResponseWriter, r *http.Request, filePath string) {
 		return
 	}
 
+	// Hash password
+	hashedPassword, err := hashPassword(userReq.Password)
+	if err != nil {
+		http.Error(w, "Failed to hash password", http.StatusInternalServerError)
+		return
+	}
+
 	// Create a new user object
 	newUser := models.User{
 		Disabled:    false,
 		Displayname: userReq.Displayname,
-		Password:    userReq.Password,
+		Password:    hashedPassword,
 		Email:       userReq.Email,
 		Groups:      userReq.Groups,
 	}
@@ -94,4 +104,25 @@ func AddUserHandler(w http.ResponseWriter, r *http.Request, filePath string) {
 	}
 
 	fmt.Fprint(w, "User added successfully")
+}
+
+// hashPassword hashes the password using Argon2
+func hashPassword(password string) (string, error) {
+	// Generate a random salt
+	salt := make([]byte, 16)
+	if _, err := rand.Read(salt); err != nil {
+		return "", err
+	}
+
+	// Hash the password using Argon2
+	hashedPassword := argon2.IDKey([]byte(password), salt, 1, 64*1024, 4, 32)
+
+	// Encode the hashed password and salt to base64
+	encodedHash := base64.RawStdEncoding.EncodeToString(hashedPassword)
+	encodedSalt := base64.RawStdEncoding.EncodeToString(salt)
+
+	// Concatenate the encoded hash and salt with a separator
+	hashed := fmt.Sprintf("$argon2id$v=19$m=65536,t=1,p=4$%s$%s", encodedSalt, encodedHash)
+
+	return hashed, nil
 }

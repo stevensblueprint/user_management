@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strings"
 	"user_management/models"
 
 	"gopkg.in/yaml.v2"
@@ -67,6 +68,12 @@ func AddUserHandler(w http.ResponseWriter, r *http.Request, filePath string) {
 			http.Error(w, "Invalid group", http.StatusBadRequest)
 			return
 		}
+	}
+
+	// Check if email belongs to @sitblueprint.com or @stevens.edu
+	if !strings.HasSuffix(userReq.Email, "@sitblueprint.com") && !strings.HasSuffix(userReq.Email, "@stevens.edu") {
+		http.Error(w, "Invalid email", http.StatusBadRequest)
+		return
 	}
 
 	// Add the new user to the users object

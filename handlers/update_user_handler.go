@@ -59,6 +59,16 @@ func UpdateUserHandler(w http.ResponseWriter, r *http.Request, filePath string) 
 		}
 	}
 
+	// If groups are updated, check if they are valid [admin, dev]
+	if userReq.Groups != nil {
+		for _, group := range userReq.Groups {
+			if group != "admin" && group != "dev" {
+				http.Error(w, "Invalid group", http.StatusBadRequest)
+				return
+			}
+		}
+	}
+
 	// Update the user object
 	user := users.Users[userReq.Username]
 	if userReq.Displayname != "" {

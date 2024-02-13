@@ -47,12 +47,22 @@ Contributions are welcome! If you would like to contribute to this project, plea
 
 
 1. Create a new branch for your feature or bug fix.
+```
+git checkout -b {feature/fix}/name-of-branch
+```
 
 2. Make your changes and commit them with descriptive commit messages.
+```
+git add {modified files}
+git commit -m "commit message"
+```
 
 3. Push your changes to your branch.
+```
+git push -u origin {branch name}
+```
 
-4. Submit a pull request, explaining the changes you have made.
+4. Submit a pull request, explaining the changes you have made. If you open the code on GitHub, you'll see a green button that says "Create Pull Request"
 
 ## Testing
 

@@ -54,14 +54,17 @@ func main() {
 		// POST /v1/users/user
 		if r.Method == http.MethodPost {
 			handlers.AddUserHandler(w, r, PATH)
+			return
 		}
 
 		if r.Method == http.MethodPut {
 			handlers.UpdateUserHandler(w, r, PATH)
+			return
 		}
 
 		if r.Method == http.MethodDelete {
 			handlers.DeleteUserHandler(w, r, PATH)
+			return
 		}
 
 		// Return 404 for all other methods
@@ -72,6 +75,7 @@ func main() {
 		// GET /v1/users/all
 		if r.Method == http.MethodGet {
 			handlers.GetAllUsersHandler(w, r, PATH)
+			return
 		}
 
 		// Return 404 for all other methods
@@ -82,6 +86,7 @@ func main() {
 		// POST /v1/users/user/enable
 		if r.Method == http.MethodPost {
 			handlers.EnableUserRequestHandler(w, r, PATH)
+			return
 		}
 
 		// Return 404 for all other methods
@@ -92,6 +97,7 @@ func main() {
 		// POST /v1/users/user/disable
 		if r.Method == http.MethodPost {
 			handlers.DisableUserHandler(w, r, PATH)
+			return
 		}
 
 		// Return 404 for all other methods

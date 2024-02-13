@@ -19,6 +19,7 @@ type AddUserRequest struct {
 }
 
 func AddUserHandler(w http.ResponseWriter, r *http.Request, filePath string) {
+	// POST /v1/users/user
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
@@ -58,6 +59,14 @@ func AddUserHandler(w http.ResponseWriter, r *http.Request, filePath string) {
 		Password:    userReq.Password,
 		Email:       userReq.Email,
 		Groups:      userReq.Groups,
+	}
+
+	// Check if groups belongs to [admin, dev]
+	for _, group := range userReq.Groups {
+		if group != "admin" && group != "dev" {
+			http.Error(w, "Invalid group", http.StatusBadRequest)
+			return
+		}
 	}
 
 	// Add the new user to the users object

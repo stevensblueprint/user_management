@@ -47,6 +47,12 @@ func EnableUserRequestHandler(w http.ResponseWriter, r *http.Request, filePath s
 		return
 	}
 
+	// Check if user is already enabled
+	if !users.Users[userReq.Username].Disabled {
+		http.Error(w, "User is already enabled", http.StatusBadRequest)
+		return
+	}
+
 	// Enable the user
 	user := users.Users[userReq.Username]
 	user.Disabled = false

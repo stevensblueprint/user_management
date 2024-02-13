@@ -108,7 +108,7 @@ func main() {
 	wrapperMux := middleware.LoggingMiddleware(mux)
 
 	// Ignore first char of PORT
-	fmt.Printf("Server is running on port %s", PORT[1:])
+	fmt.Printf("Server is running on port %s\n", PORT[1:])
 
 	if err := http.ListenAndServe(PORT, wrapperMux); err != nil {
 		log.Fatalf("Error starting server: %s\n", err)

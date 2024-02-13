@@ -48,6 +48,12 @@ func DisableUserHandler(w http.ResponseWriter, r *http.Request, filePath string)
 		return
 	}
 
+	// Check if user is already disabled
+	if users.Users[userReq.Username].Disabled {
+		http.Error(w, "User is already disabled", http.StatusBadRequest)
+		return
+	}
+
 	// Disable the user
 	user := users.Users[userReq.Username]
 	user.Disabled = true

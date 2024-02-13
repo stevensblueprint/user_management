@@ -63,15 +63,6 @@ func AddUserHandler(w http.ResponseWriter, r *http.Request, filePath string) {
 		return
 	}
 
-	// Create a new user object
-	newUser := models.User{
-		Disabled:    false,
-		Displayname: userReq.Displayname,
-		Password:    hashedPassword,
-		Email:       userReq.Email,
-		Groups:      userReq.Groups,
-	}
-
 	// Check if groups belongs to [admin, dev]
 	for _, group := range userReq.Groups {
 		if group != "admin" && group != "dev" {
@@ -84,6 +75,15 @@ func AddUserHandler(w http.ResponseWriter, r *http.Request, filePath string) {
 	if !strings.HasSuffix(userReq.Email, "@sitblueprint.com") && !strings.HasSuffix(userReq.Email, "@stevens.edu") {
 		http.Error(w, "Invalid email", http.StatusBadRequest)
 		return
+	}
+
+	// Create a new user object
+	newUser := models.User{
+		Disabled:    false,
+		Displayname: userReq.Displayname,
+		Password:    hashedPassword,
+		Email:       userReq.Email,
+		Groups:      userReq.Groups,
 	}
 
 	// Add the new user to the users object

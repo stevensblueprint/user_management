@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
@@ -10,21 +9,17 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-type DeleteUserRequest struct {
-	Username string `json:"username"`
-}
-
 func DeleteUserHandler(w http.ResponseWriter, r *http.Request, filePath string) {
-	// POST /v1/users/delete
+	// POST /v1/users/delete?username={username}
 	if r.Method != http.MethodDelete {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
-	var userReq DeleteUserRequest
-	err := json.NewDecoder(r.Body).Decode(&userReq)
-	if err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
+	// Extract the username from the query parameter
+	username := r.URL.Query().Get("username")
+	if username == "" {
+		http.Error(w, "Username is required", http.StatusBadRequest)
 		return
 	}
 
@@ -43,13 +38,13 @@ func DeleteUserHandler(w http.ResponseWriter, r *http.Request, filePath string) 
 	}
 
 	// Check if the username exists
-	if _, exists := users.Users[userReq.Username]; !exists {
+	if _, exists := users.Users[username]; !exists {
 		http.Error(w, "Username does not exist", http.StatusBadRequest)
 		return
 	}
 
 	// Delete the user
-	delete(users.Users, userReq.Username)
+	delete(users.Users, username)
 
 	// Write the updated users.yaml file
 	usersData, err = yaml.Marshal(users)
@@ -65,5 +60,5 @@ func DeleteUserHandler(w http.ResponseWriter, r *http.Request, filePath string) 
 		return
 	}
 
-	fmt.Fprintf(w, "User %s deleted successfully", userReq.Username)
+	fmt.Fprintf(w, "User %s deleted successfully", username)
 }

@@ -1,8 +1,6 @@
 package tests
 
 import (
-	"bytes"
-	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -16,15 +14,8 @@ func TestDeleteUserHandlerSuccess(t *testing.T) {
 		t.Fatalf("Failed to reset YAML file: %v", err)
 	}
 
-	// Setup request body
-	userReq := handlers.DeleteUserRequest{
-		Username: "existinguser",
-	}
-
-	body, _ := json.Marshal(userReq)
-
-	// Create an HTTP request
-	req, err := http.NewRequest("DELETE", "/deleteuser", bytes.NewBuffer(body))
+	// Construct the URL with query parameter
+	req, err := http.NewRequest("DELETE", "/deleteuser?username=existinguser", nil)
 	if err != nil {
 		t.Fatal(err)
 	}

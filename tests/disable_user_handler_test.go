@@ -1,8 +1,6 @@
 package tests
 
 import (
-	"bytes"
-	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -16,16 +14,8 @@ func TestDisableUserHandlerSuccess(t *testing.T) {
 		t.Fatalf("Failed to reset YAML file: %v", err)
 	}
 
-	// Setup request body
-	disableReq := handlers.DisableUserRequest{
-		Username: "existinguser",
-	}
-
-	// Convert Request body to JSON``
-	body, _ := json.Marshal(disableReq)
-
-	// Create an HTTP request
-	req, err := http.NewRequest("POST", "/disableuser", bytes.NewBuffer(body))
+	// Construct the URL with query parameter
+	req, err := http.NewRequest("POST", "/disableuser?username=existinguser", nil)
 	if err != nil {
 		t.Fatal(err)
 	}

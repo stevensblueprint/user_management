@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
@@ -10,21 +9,17 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-type DisableUserRequest struct {
-	Username string `json:"username"`
-}
-
 func DisableUserHandler(w http.ResponseWriter, r *http.Request, filePath string) {
-	// POST /v1/users/disable
+	// POST /v1/users/disable?username={username}
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
-	var userReq DisableUserRequest
-	err := json.NewDecoder(r.Body).Decode(&userReq)
-	if err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
+	// Extract the username from the query parameter
+	username := r.URL.Query().Get("username")
+	if username == "" {
+		http.Error(w, "Username is required", http.StatusBadRequest)
 		return
 	}
 
@@ -43,21 +38,21 @@ func DisableUserHandler(w http.ResponseWriter, r *http.Request, filePath string)
 	}
 
 	// Check if the username exists
-	if _, exists := users.Users[userReq.Username]; !exists {
+	if _, exists := users.Users[username]; !exists {
 		http.Error(w, "Username does not exist", http.StatusBadRequest)
 		return
 	}
 
 	// Check if user is already disabled
-	if users.Users[userReq.Username].Disabled {
+	if users.Users[username].Disabled {
 		http.Error(w, "User is already disabled", http.StatusBadRequest)
 		return
 	}
 
 	// Disable the user
-	user := users.Users[userReq.Username]
+	user := users.Users[username]
 	user.Disabled = true
-	users.Users[userReq.Username] = user
+	users.Users[username] = user
 
 	// Write the updated users.yaml file
 	usersData, err = yaml.Marshal(users)

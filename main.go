@@ -57,11 +57,13 @@ func main() {
 			return
 		}
 
+		// PUT /v1/users/user?username={username}
 		if r.Method == http.MethodPut {
 			handlers.UpdateUserHandler(w, r, PATH)
 			return
 		}
 
+		// DELETE /v1/users/user?username={username}
 		if r.Method == http.MethodDelete {
 			handlers.DeleteUserHandler(w, r, PATH)
 			return
@@ -83,7 +85,7 @@ func main() {
 	})
 
 	mux.HandleFunc(BASE_URL+"/user/enable", func(w http.ResponseWriter, r *http.Request) {
-		// POST /v1/users/user/enable
+		// POST /v1/users/user/enable?username={username}
 		if r.Method == http.MethodPost {
 			handlers.EnableUserRequestHandler(w, r, PATH)
 			return
@@ -94,7 +96,7 @@ func main() {
 	})
 
 	mux.HandleFunc(BASE_URL+"/user/disable", func(w http.ResponseWriter, r *http.Request) {
-		// POST /v1/users/user/disable
+		// POST /v1/users/user/disable?username={username}
 		if r.Method == http.MethodPost {
 			handlers.DisableUserHandler(w, r, PATH)
 			return

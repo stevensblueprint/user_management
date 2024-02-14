@@ -10,6 +10,8 @@ import (
 )
 
 func GetAllUsersHandler(w http.ResponseWriter, r *http.Request, filePath string) {
+	// GET /v1/users/all
+
 	if r.Method != http.MethodGet {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return

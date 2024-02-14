@@ -51,6 +51,12 @@ func main() {
 
 	// Set up the routes
 	mux.HandleFunc(BASE_URL+"/user", func(w http.ResponseWriter, r *http.Request) {
+		// GET /v1/users/user?username={username}
+		if r.Method == http.MethodGet {
+			handlers.GetUserHandler(w, r, PATH)
+			return
+		}
+
 		// POST /v1/users/user
 		if r.Method == http.MethodPost {
 			handlers.AddUserHandler(w, r, PATH)

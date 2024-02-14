@@ -13,7 +13,7 @@ type CreateUserRequest struct {
 }
 
 func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
-	// POST /v1/users/create
+	// POST /v1/users/user
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return

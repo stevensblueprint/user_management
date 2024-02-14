@@ -10,7 +10,7 @@ import (
 )
 
 func EnableUserRequestHandler(w http.ResponseWriter, r *http.Request, filePath string) {
-	// POST /v1/users/enable?username={username}
+	// POST /v1/users/user/enable?username={username}
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return

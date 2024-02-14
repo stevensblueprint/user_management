@@ -10,7 +10,7 @@ import (
 )
 
 func DeleteUserHandler(w http.ResponseWriter, r *http.Request, filePath string) {
-	// POST /v1/users/delete?username={username}
+	// POST /v1/users/user?username={username}
 	if r.Method != http.MethodDelete {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return

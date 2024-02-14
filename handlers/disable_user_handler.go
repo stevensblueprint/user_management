@@ -10,7 +10,7 @@ import (
 )
 
 func DisableUserHandler(w http.ResponseWriter, r *http.Request, filePath string) {
-	// POST /v1/users/disable?username={username}
+	// POST /v1/users/user/disable?username={username}
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return

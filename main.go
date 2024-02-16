@@ -123,6 +123,17 @@ func main() {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 	})
 
+	mux.HandleFunc(BASE_URL+"/reset_password", func(w http.ResponseWriter, r *http.Request) {
+		// PUT /v1/users/reset_password
+		if r.Method == http.MethodPut {
+			handlers.ResetPasswordHandler(w, r, PATH)
+			return
+		}
+
+		// Return 404 for all other methods
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+	})
+
 	// Health check
 	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)

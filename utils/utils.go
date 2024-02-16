@@ -26,7 +26,7 @@ func ResetYAMLFile(filePath string) error {
 	return os.WriteFile(filePath, []byte(initialState), 0644)
 }
 
-func outputHTML(w http.ResponseWriter, filename string, data interface{}) {
+func OutputHTML(w http.ResponseWriter, filename string, data interface{}) {
 	t, err := template.ParseFiles(filename)
 	if err != nil {
 		http.Error(w, "Failed to parse HTML file", http.StatusInternalServerError)

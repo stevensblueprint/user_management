@@ -4,7 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"strings"
+
+	"user_management/utils"
 )
 
 type RegisterRequest struct {
@@ -33,18 +34,8 @@ func RegisterUserHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Check if email is empty
-	if userReq.Email == "" {
-		http.Error(w, "Email cannot be empty", http.StatusBadRequest)
-		return
-	}
-
-	// Check if email belongs to @sitblueprint.com or @stevens.edu
-	if !strings.HasSuffix(userReq.Email, "@sitblueprint.com") && !strings.HasSuffix(userReq.Email, "@stevens.edu") {
-		http.Error(w, "Email domain must belong to sitblueprint.com or stevens.edu", http.StatusBadRequest)
-		return
-	}
-
-	// TODO: Create token and send email to user
+	displayName := map[string]interface{}{"displayName": userReq.Displayname}
+	utils.OutputHTML(w, "templates/register_user.html", displayName)
 
 	fmt.Fprint(w, "User created successfully")
 

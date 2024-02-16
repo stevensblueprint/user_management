@@ -112,6 +112,17 @@ func main() {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 	})
 
+	mux.HandleFunc(BASE_URL+"/register", func(w http.ResponseWriter, r *http.Request) {
+		// POST /v1/users/register
+		if r.Method == http.MethodPost {
+			handlers.RegisterUserHandler(w, r)
+			return
+		}
+
+		// Return 404 for all other methods
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+	})
+
 	// Health check
 	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)

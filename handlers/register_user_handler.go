@@ -7,19 +7,19 @@ import (
 	"strings"
 )
 
-type CreateUserRequest struct {
+type RegisterRequest struct {
 	Displayname string `json:"displayname"`
 	Email       string `json:"email"`
 }
 
-func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
-	// POST /v1/users/user
+func RegisterUserHandler(w http.ResponseWriter, r *http.Request) {
+	// POST /v1/users/register
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
-	var userReq CreateUserRequest
+	var userReq RegisterRequest
 	err := json.NewDecoder(r.Body).Decode(&userReq)
 	if err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
@@ -43,6 +43,8 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Email domain must belong to sitblueprint.com or stevens.edu", http.StatusBadRequest)
 		return
 	}
+
+	// TODO: Create token and send email to user
 
 	fmt.Fprint(w, "User created successfully")
 

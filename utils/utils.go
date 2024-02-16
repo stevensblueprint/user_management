@@ -1,7 +1,9 @@
 package utils
 
 import (
+	"net/http"
 	"os"
+	"text/template"
 )
 
 func ResetYAMLFile(filePath string) error {
@@ -22,4 +24,17 @@ func ResetYAMLFile(filePath string) error {
     groups:
       - admin`
 	return os.WriteFile(filePath, []byte(initialState), 0644)
+}
+
+func outputHTML(w http.ResponseWriter, filename string, data interface{}) {
+	t, err := template.ParseFiles(filename)
+	if err != nil {
+		http.Error(w, "Failed to parse HTML file", http.StatusInternalServerError)
+		return
+	}
+
+	if err := t.Execute(w, data); err != nil {
+		http.Error(w, "Failed to execute HTML file", http.StatusInternalServerError)
+		return
+	}
 }

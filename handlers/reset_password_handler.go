@@ -15,6 +15,7 @@ type ResetPasswordRequest struct {
 }
 
 func ResetPasswordHandler(w http.ResponseWriter, r *http.Request, filePath string) {
+	// PUT /v1/users/reset_password
 	if r.Method != http.MethodPut {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return

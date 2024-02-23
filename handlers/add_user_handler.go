@@ -22,6 +22,13 @@ type AddUserRequest struct {
 	Groups      []string `json:"groups"`
 }
 
+/*
+AddUserHandler handles the POST /v1/users/user endpoint.
+It adds a new user to the users.yaml file. It reads the request body and
+token available in the request header. If the token is in the token pool
+it will succesfully add the user to the users.yaml file. Else it will
+return a forbidden error.
+*/
 func AddUserHandler(w http.ResponseWriter, r *http.Request, filePath string) {
 	// POST /v1/users/user
 	if r.Method != http.MethodPost {

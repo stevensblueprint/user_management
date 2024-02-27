@@ -10,8 +10,6 @@ import (
 	"user_management/middleware"
 
 	"user_management/utils"
-
-	"github.com/joho/godotenv"
 )
 
 var PORT = ":8080"
@@ -35,16 +33,13 @@ func main() {
 	if prod {
 		fmt.Println("Running in prod mode")
 		PATH = os.Getenv("PATH")
+		if PATH == "" {
+			log.Fatal("Error: Environment variable PATH not set")
+		}
 	}
 	if !dev && !prod {
 		fmt.Println("Please specify a mode to run the server")
 		os.Exit(1)
-	}
-
-	// Path to the users.yml file
-	errEnvVariables := godotenv.Load()
-	if errEnvVariables != nil {
-		log.Fatal("Error: Environment variable PATH not set")
 	}
 
 	mux := http.NewServeMux()

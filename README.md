@@ -36,7 +36,16 @@ go run main.go -dev
 ```
 
 ## Docs
-Available Endpoints
+### User Schema
+```
+Displayname string
+Email string
+Password string
+Disabled bool
+Groups []string
+```
+
+### Available Endpoints
 ```
 GET /api/v1/users/user
 ```

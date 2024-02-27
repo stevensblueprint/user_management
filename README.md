@@ -4,10 +4,7 @@
 
 ## Description
 
-This project provides a user management system for the Blueprint Server. Stevens Blueprint uses Authelia as
-SSO application. Authelia provides a YAML file called users.yaml where all the authorized users are stored.
-This API intends to provide a way to manage the users.yaml. The API should provide endpoints to create, add,
-delete, update and disable users. The service will follow a RESTful API architecture. 
+Go-based User Management service is designed to interface with a users.yaml file provided by Authelia for Single Sign-On (SSO) configurations. It offers a comprehensive suite of functionalities tailored for managing user access and credentials within an SSO environment.
 
 ## Installation
 
@@ -96,6 +93,9 @@ Updates password for username found in the body of the request
 GET /api/v1/users/health
 ```
 Health check
+
+## Workflow Overview
+To maintain the API secure and to block unwanted users from creating an account, an admin user will have to register the user using the ```POST /api/v1/users/register``` endpoint. This endpoint will create a valid token that will be sent to the new user via email. The content of the email will be a welcome message, along with a URL to complete the registration using the ```POST /api/v1/users/user```. Users will only by able to complete the registration once, because the token sent in the welcome email will expire once the user sends the form.
 
 ## Contributing
 

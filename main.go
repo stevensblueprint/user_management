@@ -13,7 +13,7 @@ import (
 )
 
 var PORT = ":8080"
-var BASE_URL = "/v1/users"
+var BASE_URL = "/api/v1/users"
 
 func main() {
 	// Parse flags
@@ -38,7 +38,7 @@ func main() {
 		}
 	}
 	if !dev && !prod {
-		fmt.Println("Please specify a mode to run the server")
+		fmt.Println("Please specify a flag to run the server")
 		os.Exit(1)
 	}
 

@@ -37,9 +37,49 @@ go run main.go -dev
 
 ## Docs
 Available Endpoints
-``
-GET /api/v1/all
-``
+```
+GET /api/v1/users/user
+```
+
+```
+GET /v1/users/user?username={username}
+```
+
+```
+POST /v1/users/user
+```
+
+```
+PUT /v1/users/user?username={username}
+```
+
+```
+DELETE /v1/users/user?username={username}
+```
+
+```
+GET /v1/users/all
+```
+
+```
+POST /v1/users/user/enable?username={username}
+```
+
+```
+POST /v1/users/user/disable?username={username}
+```
+
+```
+POST /v1/users/register
+```
+
+```
+PUT /v1/users/reset_password
+```
+
+```
+/v1/users/health
+```
 
 ## Contributing
 

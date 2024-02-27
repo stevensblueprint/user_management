@@ -47,48 +47,55 @@ Groups []string
 
 ### Available Endpoints
 ```
-GET /api/v1/users/user
-```
-
-```
 GET /v1/users/user?username={username}
 ```
+Returns a user with provided username in url params
 
 ```
 POST /v1/users/user
 ```
+Adds user to yaml file
 
 ```
 PUT /v1/users/user?username={username}
 ```
+Update a user and writes updated user to yaml file
 
 ```
 DELETE /v1/users/user?username={username}
 ```
+Deletes a user from yaml file
 
 ```
 GET /v1/users/all
 ```
+Returns all users in yaml file
 
 ```
 POST /v1/users/user/enable?username={username}
 ```
+Sets enabled field of user given in URL param to true
 
 ```
 POST /v1/users/user/disable?username={username}
 ```
+Sets enabled filed of user given in URL param to false
 
 ```
 POST /v1/users/register
 ```
+Creates a token to register a user and adds it to pool of valid tokens. Sends invitation to the new user
+to finish creating the account. 
 
 ```
 PUT /v1/users/reset_password
 ```
+Updates password for username found in the body of the request
 
 ```
 /v1/users/health
 ```
+Health check
 
 ## Contributing
 

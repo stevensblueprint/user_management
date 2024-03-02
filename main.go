@@ -10,6 +10,8 @@ import (
 	"user_management/middleware"
 
 	"user_management/utils"
+
+	"github.com/rs/cors"
 )
 
 var PORT = ":8080"
@@ -70,7 +72,11 @@ func main() {
 			return
 		}
 
-		// Return 404 for all other methods
+		if r.Method == http.MethodHead {
+			return
+		}
+
+		// Return 405 for all other methods
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 	})
 
@@ -81,7 +87,11 @@ func main() {
 			return
 		}
 
-		// Return 404 for all other methods
+		if r.Method == http.MethodHead {
+			return
+		}
+
+		// Return 405 for all other methods
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 	})
 
@@ -92,7 +102,7 @@ func main() {
 			return
 		}
 
-		// Return 404 for all other methods
+		// Return 405 for all other methods
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 	})
 
@@ -103,7 +113,7 @@ func main() {
 			return
 		}
 
-		// Return 404 for all other methods
+		// Return 405 for all other methods
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 	})
 
@@ -114,7 +124,7 @@ func main() {
 			return
 		}
 
-		// Return 404 for all other methods
+		// Return 405 for all other methods
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 	})
 
@@ -125,7 +135,7 @@ func main() {
 			return
 		}
 
-		// Return 404 for all other methods
+		// Return 405 for all other methods
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 	})
 
@@ -136,12 +146,14 @@ func main() {
 	})
 
 	// Start the HTTP server
-	wrapperMux := middleware.LoggingMiddleware(mux)
+	handler := cors.Default().Handler(
+		middleware.LoggingMiddleware(mux),
+	)
 
 	// Ignore first char of PORT
 	fmt.Printf("Server is running on port %s\n", PORT[1:])
 
-	if err := http.ListenAndServe(PORT, wrapperMux); err != nil {
+	if err := http.ListenAndServe(PORT, handler); err != nil {
 		log.Fatalf("Error starting server: %s\n", err)
 	}
 

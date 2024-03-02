@@ -12,7 +12,6 @@ services:
     build:
       dockerfile: Dockerfile
       context: .
-      target: development
     restart: always
     depends_on:
       - cache

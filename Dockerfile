@@ -1,13 +1,13 @@
 FROM golang:1.16 as base
 
-COPY . .
-
+COPY go.mod go.sum ./
 RUN go mod download
 
 COPY . .
 
+FROM base as development
 RUN go build -o main .
 
-EXPOSE 8080
+CMD ["./main"]
 
-CMD ["./main -dev"]
+EXPOSE 8080

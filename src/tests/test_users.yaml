@@ -1,0 +1,8 @@
+users:
+  existinguser:
+    disabled: false
+    displayname: Existing User
+    password: existingpassword
+    email: existinguser@example.com
+    groups:
+    - group1

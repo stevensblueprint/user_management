@@ -1,8 +1,6 @@
 FROM golang:1.16 as base
 
-FROM base as dev
-
-COPY go.mod go.sum ./
+COPY . .
 
 RUN go mod download
 

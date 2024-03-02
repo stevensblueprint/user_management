@@ -21,10 +21,12 @@ func main() {
 	// Parse flags
 	var dev bool
 	var prod bool
+	var help bool
 	var PATH string
 
 	flag.BoolVar(&dev, "dev", false, "Run the server in development mode")
 	flag.BoolVar(&prod, "prod", false, "Run the server in production mode")
+	flag.BoolVar(&help, "h", false, "Show help")
 	flag.Parse()
 
 	if dev {
@@ -39,8 +41,12 @@ func main() {
 			log.Fatal("Error: Environment variable PATH not set")
 		}
 	}
-	if !dev && !prod {
-		fmt.Println("Please specify a flag to run the server")
+	if help {
+		fmt.Println("Usage: main.go [-dev] [-prod] [-path PATH]")
+		os.Exit(0)
+	}
+	if !dev && !prod && !help {
+		fmt.Println("Usage: main.go [-dev] [-prod] [-path PATH]")
 		os.Exit(1)
 	}
 

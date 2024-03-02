@@ -29,25 +29,27 @@ func main() {
 	flag.BoolVar(&help, "h", false, "Show help")
 	flag.Parse()
 
-	if dev {
+	// Check for flags
+	switch {
+	case dev && prod:
+		fmt.Println("Usage: Cannot run in both dev and prod mode")
+		os.Exit(1)
+	case !dev && !prod && !help:
+		fmt.Println("Usage: main.go [-dev] [-prod] [-path PATH]")
+		os.Exit(1)
+	case dev:
 		fmt.Println("Running in dev mode")
 		PATH = "users.yaml"
 		utils.ResetYAMLFile(PATH)
-	}
-	if prod {
+	case prod:
 		fmt.Println("Running in prod mode")
 		PATH = os.Getenv("PATH")
 		if PATH == "" {
 			log.Fatal("Error: Environment variable PATH not set")
 		}
-	}
-	if help {
+	case help:
 		fmt.Println("Usage: main.go [-dev] [-prod] [-path PATH]")
 		os.Exit(0)
-	}
-	if !dev && !prod && !help {
-		fmt.Println("Usage: main.go [-dev] [-prod] [-path PATH]")
-		os.Exit(1)
 	}
 
 	mux := http.NewServeMux()

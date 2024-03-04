@@ -2,16 +2,33 @@ package tests
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 	"user_management/handlers"
+
+	"github.com/redis/go-redis/v9"
 )
 
-func TestAddUserHandlerSuccess(t *testing.T) {
+func TestAddUserHandlerSuccess(t *testing.T) { // Will fail unless since cant add token in headers
+	// Connects to database 1
+	client := redis.NewClient(&redis.Options{
+		Addr:     "localhost:6379",
+		Password: "",
+		DB:       1,
+	})
+	ctx := context.Background()
+
+	// Reset the test database
+	err := client.Del(ctx, "tokenPool").Err()
+	if err != nil {
+		t.Fatalf(("Failed to reset database"))
+	}
+
 	// Reset the test_users.yaml file
-	err := resetYAMLFile("test_users.yaml")
+	err = resetYAMLFile("test_users.yaml")
 	if err != nil {
 		t.Fatalf("Failed to reset YAML file: %v", err)
 	}
@@ -34,7 +51,7 @@ func TestAddUserHandlerSuccess(t *testing.T) {
 
 	rr := httptest.NewRecorder()
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		handlers.AddUserHandler(w, r, "test_users.yaml")
+		handlers.AddUserHandler(w, r, "test_users.yaml", client)
 	})
 
 	// Call the handler
@@ -52,8 +69,23 @@ func TestAddUserHandlerSuccess(t *testing.T) {
 }
 
 func TestAddUserHandlerInvalidMethod(t *testing.T) {
+	// Connects to database 1
+	client := redis.NewClient(&redis.Options{
+		Addr:     "localhost:6379",
+		Password: "",
+		DB:       1,
+	})
+
+	ctx := context.Background()
+
+	// Reset the test database
+	err := client.Del(ctx, "tokenPool").Err()
+	if err != nil {
+		t.Fatalf(("Failed to reset database"))
+	}
+
 	// Reset the test_users.yaml file
-	err := resetYAMLFile("test_users.yaml")
+	err = resetYAMLFile("test_users.yaml")
 	if err != nil {
 		t.Fatalf("Failed to reset YAML file: %v", err)
 	}
@@ -65,7 +97,7 @@ func TestAddUserHandlerInvalidMethod(t *testing.T) {
 
 	rr := httptest.NewRecorder()
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		handlers.AddUserHandler(w, r, "test_users.yaml")
+		handlers.AddUserHandler(w, r, "test_users.yaml", client)
 	})
 
 	handler.ServeHTTP(rr, req)

@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>PLACEHOLDER</title>
-    <link rel="stylesheet" type="text/css" href="../css/styles.css" />
+    <title>Signup</title>
+    <link rel="stylesheet" href="/css/styles.css" />
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap"
@@ -11,18 +11,84 @@
   <body>
     <div class="rectangle"></div>
     <div class="logo">
-      <img src="../logos/logo_banner_negative.png" />
+      <img src="/logos/logo_banner_negative.png" />
     </div>
     <div class="welcome">
       <p>Excited to have you! Let's quickly set up your account.</p>
     </div>
-    <div class="input">
-      <h1>Welcome {{.displayName}}!</h1>
-      <input type="text" id="name" placeholder="Name" />
+    <form id="form" class="input">
+      <h1>Welcome {{.Displayname}}!</h1>
+      <input type="text" id="first_name" placeholder="First Name" />
       <input type="text" id="last_name" placeholder="Last Name" />
       <input type="text" id="username" placeholder="Username" />
+      <input type="password" id="password" placeholder="Password" />
       <input type="email" id="email" placeholder="Email" />
-      <button>Sign Up</button>
-    </div>
+      <button type="submit">Sign Up</button>
+    </form>
   </body>
+  <script type="application/javascript">
+    const form = document.getElementById("form");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      let firstName = document.getElementById("first_name").value;
+      let lastName = document.getElementById("last_name").value;
+      let username = document.getElementById("username").value;
+      let password = document.getElementById("password").value;
+      let email = document.getElementById("email").value;
+
+      if (!firstName.match(/^[a-z]+$/i)) {
+        return;
+      }
+      if (!lastName.match(/^[a-z]+$/i)) {
+        return;
+      }
+      if (!username.match(/^\w+$/)) {
+        return;
+      }
+      // Password check?
+      // Email check?
+
+      firstName = firstName.trim();
+      lastName = lastName.trim();
+      username = username.trim();
+      password = password.trim();
+      email = email.trim();
+
+      if (
+        firstName.length === 0 ||
+        lastName.length === 0 ||
+        username.length === 0 ||
+        password.length === 0 ||
+        email.length === 0
+      ) {
+        return;
+      }
+
+      const url = new URL(window.location.href);
+      const token = url.searchParams.get("token");
+
+      const response = await fetch("/api/v1/users/user", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          Username: username,
+          Password: password,
+          Displayname: firstName + " " + lastName,
+          Email: email,
+          Groups: ["dev"],
+        }),
+      });
+
+      if (response.status === 200) {
+        window.location.replace("http://admin.sitblueprint.com/");
+      } else {
+        console.log(response.statusText);
+      }
+    });
+  </script>
 </html>

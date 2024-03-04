@@ -1,9 +1,13 @@
 package utils
 
 import (
+	"crypto/rand"
+	"crypto/sha256"
+	"encoding/hex"
+	"html/template"
+
 	"net/http"
 	"os"
-	"text/template"
 )
 
 func ResetYAMLFile(filePath string) error {
@@ -37,4 +41,18 @@ func OutputHTML(w http.ResponseWriter, filename string, data interface{}) {
 		http.Error(w, "Failed to execute HTML file", http.StatusInternalServerError)
 		return
 	}
+}
+
+func GenerateSecureToken(length int) string {
+	b := make([]byte, length)
+	if _, err := rand.Read(b); err != nil {
+		return ""
+	}
+	return hex.EncodeToString(b)
+}
+
+func HashToken(input string) string {
+	plainText := []byte(input)
+	sha256Hash := sha256.Sum256(plainText)
+	return hex.EncodeToString(sha256Hash[:])
 }

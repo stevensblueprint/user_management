@@ -11,6 +11,7 @@ import (
 
 	"user_management/utils"
 
+	"github.com/redis/go-redis/v9"
 	"github.com/rs/cors"
 )
 
@@ -52,7 +53,17 @@ func main() {
 		os.Exit(0)
 	}
 
+	// Connects to database 0
+	client := redis.NewClient(&redis.Options{
+		Addr:     "localhost:6379",
+		Password: "",
+		DB:       0,
+	})
+
 	mux := http.NewServeMux()
+
+	// Static route
+	mux.Handle("/", http.FileServer(http.Dir("./static")))
 
 	// Set up the routes
 	mux.HandleFunc(BASE_URL+"/user", func(w http.ResponseWriter, r *http.Request) {
@@ -64,7 +75,7 @@ func main() {
 
 		// POST /v1/users/user
 		if r.Method == http.MethodPost {
-			handlers.AddUserHandler(w, r, PATH)
+			handlers.AddUserHandler(w, r, PATH, client)
 			return
 		}
 
@@ -126,9 +137,14 @@ func main() {
 	})
 
 	mux.HandleFunc(BASE_URL+"/register", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodGet {
+			handlers.RegisterPageHandler(w, r)
+			return
+		}
+
 		// POST /v1/users/register
 		if r.Method == http.MethodPost {
-			handlers.RegisterUserHandler(w, r)
+			handlers.RegisterUserHandler(w, r, client)
 			return
 		}
 

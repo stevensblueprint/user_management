@@ -1,15 +1,15 @@
 FROM golang:1.16 as base
 ENV GO111MODULE=on
 
-WORKDIR /src
+WORKDIR /app
 
-COPY go.mod go.sum ./
-RUN go mod download
+COPY ./src/go.mod ./src/go.sum ./src/
+RUN cd src && go mod download
 
 COPY . .
 
-RUN go build -o main .
+RUN cd src && go build -o main .
 
-CMD ["./main -prod"]
+CMD [".src/main -prod"]
 
 EXPOSE 8080

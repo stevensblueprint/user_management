@@ -6,13 +6,12 @@ import (
 	"fmt"
 	"net/http"
 	"net/smtp"
-	"os"
 	"strings"
 
 	"user_management/utils"
 
-	"github.com/joho/godotenv"
 	"github.com/jordan-wright/email"
+	"github.com/knadh/koanf/v2"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -21,9 +20,14 @@ type RegisterRequest struct {
 	Email       string `json:"email"`
 }
 
+type WelcomeTemplateData struct {
+	Displayname string
+	SignupUrl   string
+}
+
 var REGISTER_PAGE_URL = "http://localhost:8080/api/v1/users/register"
 
-func RegisterUserHandler(w http.ResponseWriter, r *http.Request, client *redis.Client) {
+func RegisterUserHandler(w http.ResponseWriter, r *http.Request, configFile *koanf.Koanf, redisClient *redis.Client, ctx context.Context) {
 	// POST /v1/users/register
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -51,20 +55,12 @@ func RegisterUserHandler(w http.ResponseWriter, r *http.Request, client *redis.C
 		return
 	}
 
-	err = godotenv.Load(".env")
-	if err != nil {
-		http.Error(w, "Error loading .env file", http.StatusInternalServerError)
-		return
-	}
-
-	ctx := context.Background()
-
 	// Creates token
 	token := utils.GenerateSecureToken(10)
 	token = utils.HashToken(token)
 
 	// Stores token in redis
-	err = client.SAdd(ctx, "tokenPool", token).Err()
+	err = redisClient.SAdd(ctx, "tokenPool", token).Err()
 	if err != nil {
 		http.Error(w, "Unable to store token", http.StatusInternalServerError)
 		return
@@ -73,10 +69,20 @@ func RegisterUserHandler(w http.ResponseWriter, r *http.Request, client *redis.C
 	// Sends registration email to user
 	queryDisplayname := strings.ReplaceAll(userDisplayname, " ", "%20")
 	url := fmt.Sprintf(REGISTER_PAGE_URL+"?displayname=%s&token=%s", queryDisplayname, token)
-	plainAuthUsername := os.Getenv("PLAIN_AUTH_USERNAME")
-	plainAuthPassword := os.Getenv("PLAIN_AUTH_PASSWORD")
+	smtpUsername := configFile.String("smtp.USERNAME")
+	smtpPassword := configFile.String("smtp.PASSWORD")
+
+	htmlString, err := utils.OutputHTMLString("./static/html/welcome.html", WelcomeTemplateData{
+		Displayname: userDisplayname,
+		SignupUrl:   url,
+	})
+	if err != nil {
+		http.Error(w, "Unable to generate HTML email.", http.StatusInternalServerError)
+		return
+	}
+
 	e := &email.Email{
-		From:    "Stevens Blueprint <test@sitblueprint.com>",
+		From:    "Stevens Blueprint <welcome@sitblueprint.com>",
 		To:      []string{userEmail},
 		Subject: "Blueprint Registration",
 		Text: []byte(fmt.Sprintf(`
@@ -91,8 +97,9 @@ func RegisterUserHandler(w http.ResponseWriter, r *http.Request, client *redis.C
 
 		Warm regards,
 		Blueprint E-Board`, userDisplayname, url)),
+		HTML: []byte(htmlString),
 	}
-	err = e.Send("smtp.gmail.com:587", smtp.PlainAuth("", plainAuthUsername, plainAuthPassword, "smtp.gmail.com")) // Needs email with permission to use gmail
+	err = e.Send("smtp.gmail.com:587", smtp.PlainAuth("", smtpUsername, smtpPassword, "smtp.gmail.com"))
 	if err != nil {
 		http.Error(w, "Unable to send email", http.StatusInternalServerError)
 		return

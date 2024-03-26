@@ -1,6 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <title>Signup</title>
     <link rel="stylesheet" href="/css/styles.css" />
     <link
@@ -37,18 +39,6 @@
       let username = document.getElementById("username").value;
       let password = document.getElementById("password").value;
       let email = document.getElementById("email").value;
-
-      if (!firstName.match(/^[a-z]+$/i)) {
-        return;
-      }
-      if (!lastName.match(/^[a-z]+$/i)) {
-        return;
-      }
-      if (!username.match(/^\w+$/)) {
-        return;
-      }
-      // Password check?
-      // Email check?
 
       firstName = firstName.trim();
       lastName = lastName.trim();

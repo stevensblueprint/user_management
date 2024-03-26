@@ -5,6 +5,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"html/template"
+	"strings"
 
 	"net/http"
 	"os"
@@ -41,6 +42,21 @@ func OutputHTML(w http.ResponseWriter, filename string, data interface{}) {
 		http.Error(w, "Failed to execute HTML file", http.StatusInternalServerError)
 		return
 	}
+}
+
+func OutputHTMLString(filename string, data interface{}) (string, error) {
+	t, err := template.ParseFiles(filename)
+	if err != nil {
+		return "", err
+	}
+
+	builder := &strings.Builder{}
+
+	if err := t.Execute(builder, data); err != nil {
+		return "", err
+	}
+
+	return builder.String(), nil
 }
 
 func GenerateSecureToken(length int) string {

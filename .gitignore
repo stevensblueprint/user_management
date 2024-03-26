@@ -27,3 +27,6 @@ user_management
 
 # Ignore environment file
 .env
+
+# Ignore config.toml file
+config.toml

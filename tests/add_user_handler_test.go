@@ -12,7 +12,7 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-func TestAddUserHandlerSuccess(t *testing.T) { // Will fail unless since cant add token in headers
+func TestAddUserHandlerSuccess(t *testing.T) {
 	// Connects to database 1
 	client := redis.NewClient(&redis.Options{
 		Addr:     "localhost:6379",

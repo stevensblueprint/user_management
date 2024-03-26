@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"log"
@@ -11,12 +12,43 @@ import (
 
 	"user_management/utils"
 
+	"github.com/knadh/koanf/parsers/toml"
+	"github.com/knadh/koanf/providers/file"
+	"github.com/knadh/koanf/v2"
 	"github.com/redis/go-redis/v9"
 	"github.com/rs/cors"
 )
 
 var PORT = ":8080"
 var BASE_URL = "/api/v1/users"
+
+const (
+	configPath = "config.toml"
+)
+
+var (
+	configFile  = koanf.New(".")
+	redisClient = redis.NewClient(&redis.Options{
+		Addr:     "127.0.0.1:6379",
+		Password: "",
+		DB:       0,
+	})
+	ctx = context.Background()
+)
+
+func init() {
+	if err := configFile.Load(file.Provider(configPath), toml.Parser()); err != nil {
+		log.Fatalf("Error loading config file: %s", err)
+	}
+
+	if configFile.String("smtp.USERNAME") == "" {
+		log.Fatal("SMTP username is required in config file.")
+	}
+
+	if configFile.String("smtp.PASSWORD") == "" {
+		log.Fatal("SMTP password is required in config file.")
+	}
+}
 
 func main() {
 	// Parse flags
@@ -53,13 +85,6 @@ func main() {
 		os.Exit(0)
 	}
 
-	// Connects to database 0
-	client := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
-		Password: "",
-		DB:       0,
-	})
-
 	mux := http.NewServeMux()
 
 	// Static route
@@ -75,7 +100,7 @@ func main() {
 
 		// POST /v1/users/user
 		if r.Method == http.MethodPost {
-			handlers.AddUserHandler(w, r, PATH, client)
+			handlers.AddUserHandler(w, r, PATH, redisClient, ctx)
 			return
 		}
 
@@ -144,7 +169,7 @@ func main() {
 
 		// POST /v1/users/register
 		if r.Method == http.MethodPost {
-			handlers.RegisterUserHandler(w, r, client)
+			handlers.RegisterUserHandler(w, r, configFile, redisClient, ctx)
 			return
 		}
 

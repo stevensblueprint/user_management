@@ -31,7 +31,7 @@ token available in the request header. If the token is in the token pool
 it will succesfully add the user to the users.yaml file. Else it will
 return a forbidden error.
 */
-func AddUserHandler(w http.ResponseWriter, r *http.Request, filePath string, client *redis.Client) {
+func AddUserHandler(w http.ResponseWriter, r *http.Request, filePath string, redisClient *redis.Client, ctx context.Context) {
 	// POST /v1/users/user
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -63,9 +63,7 @@ func AddUserHandler(w http.ResponseWriter, r *http.Request, filePath string, cli
 		return
 	}
 
-	ctx := context.Background()
-
-	val, err := client.SIsMember(ctx, "tokenPool", requestToken).Result()
+	val, err := redisClient.SIsMember(ctx, "tokenPool", requestToken).Result()
 	if err != nil {
 		http.Error(w, "Unable to access redis", http.StatusInternalServerError)
 		return
@@ -142,7 +140,7 @@ func AddUserHandler(w http.ResponseWriter, r *http.Request, filePath string, cli
 		return
 	}
 
-	_, err = client.SRem(ctx, "tokenPool", requestToken).Result()
+	_, err = redisClient.SRem(ctx, "tokenPool", requestToken).Result()
 	if err != nil {
 		http.Error(w, "Unable to access redis", http.StatusInternalServerError)
 		return

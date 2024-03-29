@@ -41,6 +41,14 @@ func init() {
 		log.Fatalf("Error loading config file: %s", err)
 	}
 
+	if configFile.String("smtp.HOST") == "" {
+		log.Fatal("SMTP host is required in config file.")
+	}
+
+	if configFile.String("smtp.PORT") == "" {
+		log.Fatal("SMTP port is required in config file.")
+	}
+
 	if configFile.String("smtp.USERNAME") == "" {
 		log.Fatal("SMTP username is required in config file.")
 	}

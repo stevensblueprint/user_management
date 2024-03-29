@@ -44,7 +44,7 @@ func RegisterUserHandler(w http.ResponseWriter, r *http.Request, configFile *koa
 	// Check if display name is empty
 	userDisplayname := strings.TrimSpace(userReq.Displayname)
 	if userDisplayname == "" {
-		http.Error(w, "Display name cannot be empty", http.StatusBadRequest)
+		http.Error(w, "Display name cannot be empty.", http.StatusBadRequest)
 		return
 	}
 
@@ -66,9 +66,10 @@ func RegisterUserHandler(w http.ResponseWriter, r *http.Request, configFile *koa
 		return
 	}
 
-	// Sends registration email to user
 	queryDisplayname := strings.ReplaceAll(userDisplayname, " ", "%20")
 	url := fmt.Sprintf(REGISTER_PAGE_URL+"?displayname=%s&token=%s", queryDisplayname, token)
+	smtpHost := configFile.String("smtp.HOST")
+	smtpPort := configFile.String("smtp.PORT")
 	smtpUsername := configFile.String("smtp.USERNAME")
 	smtpPassword := configFile.String("smtp.PASSWORD")
 
@@ -77,12 +78,13 @@ func RegisterUserHandler(w http.ResponseWriter, r *http.Request, configFile *koa
 		SignupUrl:   url,
 	})
 	if err != nil {
-		http.Error(w, "Unable to generate HTML email.", http.StatusInternalServerError)
+		http.Error(w, "Unable to generate HTML email", http.StatusInternalServerError)
 		return
 	}
 
+	// Sends registration email to user
 	e := &email.Email{
-		From:    "Stevens Blueprint <welcome@sitblueprint.com>",
+		From:    fmt.Sprintf(`Stevens Blueprint <%s>`, smtpUsername),
 		To:      []string{userEmail},
 		Subject: "Blueprint Registration",
 		Text: []byte(fmt.Sprintf(`
@@ -99,7 +101,14 @@ func RegisterUserHandler(w http.ResponseWriter, r *http.Request, configFile *koa
 		Blueprint E-Board`, userDisplayname, url)),
 		HTML: []byte(htmlString),
 	}
-	err = e.Send("smtp.gmail.com:587", smtp.PlainAuth("", smtpUsername, smtpPassword, "smtp.gmail.com"))
+	_, err = e.AttachFile("./static/logos/logo.png")
+	if err != nil {
+		fmt.Println(err)
+		http.Error(w, "Unable to attach logo", http.StatusInternalServerError)
+		return
+	}
+
+	err = e.Send(smtpHost+":"+smtpPort, smtp.PlainAuth("", smtpUsername, smtpPassword, smtpHost))
 	if err != nil {
 		http.Error(w, "Unable to send email", http.StatusInternalServerError)
 		return

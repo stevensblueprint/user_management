@@ -51,7 +51,7 @@ func TestAddUserHandlerSuccess(t *testing.T) {
 
 	rr := httptest.NewRecorder()
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		handlers.AddUserHandler(w, r, "test_users.yaml", client)
+		handlers.AddUserHandler(w, r, "test_users.yaml", client, ctx)
 	})
 
 	// Call the handler
@@ -97,7 +97,7 @@ func TestAddUserHandlerInvalidMethod(t *testing.T) {
 
 	rr := httptest.NewRecorder()
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		handlers.AddUserHandler(w, r, "test_users.yaml", client)
+		handlers.AddUserHandler(w, r, "test_users.yaml", client, ctx)
 	})
 
 	handler.ServeHTTP(rr, req)

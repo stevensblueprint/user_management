@@ -34,27 +34,11 @@
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
 
-      let firstName = document.getElementById("first_name").value;
-      let lastName = document.getElementById("last_name").value;
-      let username = document.getElementById("username").value;
-      let password = document.getElementById("password").value;
-      let email = document.getElementById("email").value;
-
-      firstName = firstName.trim();
-      lastName = lastName.trim();
-      username = username.trim();
-      password = password.trim();
-      email = email.trim();
-
-      if (
-        firstName.length === 0 ||
-        lastName.length === 0 ||
-        username.length === 0 ||
-        password.length === 0 ||
-        email.length === 0
-      ) {
-        return;
-      }
+      const firstName = document.getElementById("first_name").value;
+      const lastName = document.getElementById("last_name").value;
+      const username = document.getElementById("username").value;
+      const password = document.getElementById("password").value;
+      const email = document.getElementById("email").value;
 
       const url = new URL(window.location.href);
       const token = url.searchParams.get("token");

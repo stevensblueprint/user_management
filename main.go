@@ -27,18 +27,20 @@ const (
 )
 
 var (
-	configFile  = koanf.New(".")
-	redisClient = redis.NewClient(&redis.Options{
-		Addr:     "redis:6379",
-		Password: "",
-		DB:       0,
-	})
-	ctx = context.Background()
+	configFile = koanf.New(".")
 )
 
 func init() {
 	if err := configFile.Load(file.Provider(configPath), toml.Parser()); err != nil {
 		log.Fatalf("Error loading config file: %s", err)
+	}
+
+	if configFile.String("redis.HOST") == "" {
+		log.Fatal("Redis host is required in config file.")
+	}
+
+	if configFile.String("redis.PORT") == "" {
+		log.Fatal("Redis port is required in config file.")
 	}
 
 	if configFile.String("smtp.HOST") == "" {
@@ -92,6 +94,13 @@ func main() {
 		fmt.Println("Usage: main.go [-dev] [-prod] [-path PATH]")
 		os.Exit(0)
 	}
+
+	redisClient := redis.NewClient(&redis.Options{
+		Addr:     configFile.String("redis.HOST") + ":" + configFile.String("redis.PORT"),
+		Password: "",
+		DB:       0,
+	})
+	ctx := context.Background()
 
 	mux := http.NewServeMux()
 

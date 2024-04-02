@@ -1,3 +1,7 @@
+[redis]
+HOST = ""
+PORT = ""
+
 [smtp]
 HOST = ""
 PORT = ""

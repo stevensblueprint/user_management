@@ -1,3 +1,7 @@
+BASE_URL = ""
+YAML_PATH = "" 
+SECRET = ""
+
 [redis]
 HOST = ""
 PORT = ""

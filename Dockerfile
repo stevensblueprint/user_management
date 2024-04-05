@@ -10,6 +10,6 @@ COPY . .
 
 RUN go build
 
-CMD ["./user_management", "-dev"]
+CMD ["./user_management"]
 
 EXPOSE 8080

@@ -25,8 +25,6 @@ type WelcomeTemplateData struct {
 	SignupUrl   string
 }
 
-var REGISTER_PAGE_URL = "http://localhost:8080/api/v1/users/register"
-
 func RegisterUserHandler(w http.ResponseWriter, r *http.Request, configFile *koanf.Koanf, redisClient *redis.Client, ctx context.Context) {
 	// POST /v1/users/register
 	if r.Method != http.MethodPost {
@@ -44,7 +42,7 @@ func RegisterUserHandler(w http.ResponseWriter, r *http.Request, configFile *koa
 	// Check if display name is empty
 	userDisplayname := strings.TrimSpace(userReq.Displayname)
 	if userDisplayname == "" {
-		http.Error(w, "Display name cannot be empty.", http.StatusBadRequest)
+		http.Error(w, "Display name cannot be empty", http.StatusBadRequest)
 		return
 	}
 
@@ -66,8 +64,11 @@ func RegisterUserHandler(w http.ResponseWriter, r *http.Request, configFile *koa
 		return
 	}
 
-	queryDisplayname := strings.ReplaceAll(userDisplayname, " ", "%20")
-	url := fmt.Sprintf(REGISTER_PAGE_URL+"?displayname=%s&token=%s", queryDisplayname, token)
+	encodedDisplayname := strings.ReplaceAll(userDisplayname, " ", "%20")
+	baseUrl := configFile.String("BASE_URL")
+
+	url := fmt.Sprintf(baseUrl+"?displayname=%s&token=%s", encodedDisplayname, token)
+
 	smtpHost := configFile.String("smtp.HOST")
 	smtpPort := configFile.String("smtp.PORT")
 	smtpUsername := configFile.String("smtp.USERNAME")

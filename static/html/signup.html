@@ -34,11 +34,11 @@
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
 
-      const firstName = document.getElementById("first_name").value;
-      const lastName = document.getElementById("last_name").value;
-      const username = document.getElementById("username").value;
-      const password = document.getElementById("password").value;
-      const email = document.getElementById("email").value;
+      const firstName = document.getElementById("first_name").value.trim();
+      const lastName = document.getElementById("last_name").value.trim();
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const email = document.getElementById("email").value.trim();
 
       const url = new URL(window.location.href);
       const token = url.searchParams.get("token");
@@ -58,7 +58,7 @@
         }),
       });
 
-      if (response.status === 200) {
+      if (response.ok) {
         window.location.replace("http://admin.sitblueprint.com/");
       } else {
         console.log(response.statusText);

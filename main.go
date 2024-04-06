@@ -28,6 +28,18 @@ func init() {
 		log.Fatalf("Error loading config file: %s", err)
 	}
 
+	if CONFIG_FILE.String("BASE_URL") == "" {
+		log.Fatal("Base URL is required in config file.")
+	}
+
+	if CONFIG_FILE.String("YAML_PATH") == "" {
+		log.Fatal("YAML path is required in config file.")
+	}
+
+	if CONFIG_FILE.String("SECRET") == "" {
+		log.Fatal("Secret is required in config file.")
+	}
+
 	if CONFIG_FILE.String("redis.HOST") == "" {
 		log.Fatal("Redis host is required in config file.")
 	}
@@ -78,7 +90,7 @@ func main() {
 
 		// POST /v1/users/user
 		if r.Method == http.MethodPost {
-			handlers.AddUserHandler(w, r, YAML_PATH, redisClient, ctx)
+			handlers.AddUserHandler(w, r, YAML_PATH, CONFIG_FILE, redisClient, ctx)
 			return
 		}
 

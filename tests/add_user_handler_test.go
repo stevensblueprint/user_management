@@ -9,10 +9,12 @@ import (
 	"testing"
 	"user_management/handlers"
 
+	"github.com/knadh/koanf/v2"
 	"github.com/redis/go-redis/v9"
 )
 
 func TestAddUserHandlerSuccess(t *testing.T) {
+	configFile := koanf.New(".")
 	// Connects to database 1
 	redisClient := redis.NewClient(&redis.Options{
 		Addr:     "localhost:6379",
@@ -60,7 +62,7 @@ func TestAddUserHandlerSuccess(t *testing.T) {
 
 	rr := httptest.NewRecorder()
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		handlers.AddUserHandler(w, r, "test_users.yaml", redisClient, ctx)
+		handlers.AddUserHandler(w, r, "test_users.yaml", configFile, redisClient, ctx)
 	})
 
 	// Call the handler
@@ -78,6 +80,7 @@ func TestAddUserHandlerSuccess(t *testing.T) {
 }
 
 func TestAddUserHandlerInvalidMethod(t *testing.T) {
+	configFile := koanf.New(".")
 	// Connects to database 1
 	redisClient := redis.NewClient(&redis.Options{
 		Addr:     "localhost:6379",
@@ -115,7 +118,7 @@ func TestAddUserHandlerInvalidMethod(t *testing.T) {
 
 	rr := httptest.NewRecorder()
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		handlers.AddUserHandler(w, r, "test_users.yaml", redisClient, ctx)
+		handlers.AddUserHandler(w, r, "test_users.yaml", configFile, redisClient, ctx)
 	})
 
 	handler.ServeHTTP(rr, req)

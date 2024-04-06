@@ -10,7 +10,9 @@ import (
 	"os"
 	"strings"
 	"user_management/models"
+	"user_management/utils"
 
+	"github.com/knadh/koanf/v2"
 	"github.com/redis/go-redis/v9"
 	"golang.org/x/crypto/argon2"
 	"gopkg.in/yaml.v2"
@@ -31,13 +33,14 @@ token available in the request header. If the token is in the token pool
 it will succesfully add the user to the users.yaml file. Else it will
 return a forbidden error.
 */
-func AddUserHandler(w http.ResponseWriter, r *http.Request, filePath string, redisClient *redis.Client, ctx context.Context) {
+func AddUserHandler(w http.ResponseWriter, r *http.Request, filePath string, configFile *koanf.Koanf, redisClient *redis.Client, ctx context.Context) {
 	// POST /v1/users/user
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
+	// Get request body
 	var userReq AddUserRequest
 	err := json.NewDecoder(r.Body).Decode(&userReq)
 	if err != nil {
@@ -45,25 +48,37 @@ func AddUserHandler(w http.ResponseWriter, r *http.Request, filePath string, red
 		return
 	}
 
-	requestToken := r.Header.Get("Authorization")
-	if requestToken == "" {
+	// Get authorization header
+	encryptedToken := r.Header.Get("Authorization")
+	if encryptedToken == "" {
 		http.Error(w, "No authorization headers", http.StatusUnauthorized)
 		return
 	}
 
-	splitToken := strings.Split(requestToken, "Bearer ")
+	// Parse authorization header
+	splitToken := strings.Split(encryptedToken, "Bearer ")
 	if len(splitToken) != 2 {
 		http.Error(w, "Invalid authorization header format", http.StatusUnauthorized)
 		return
 	}
 
-	requestToken = splitToken[1]
-	if requestToken == "" {
+	// Check if token exists
+	encryptedToken = splitToken[1]
+	if encryptedToken == "" {
 		http.Error(w, "No authorization token found", http.StatusUnauthorized)
 		return
 	}
 
-	val, err := redisClient.SIsMember(ctx, "tokenPool", requestToken).Result()
+	// Decrypt request token
+	secret := configFile.String("SECRET")
+	token, err := utils.DecryptString([]byte(secret), encryptedToken)
+	if err != nil {
+		http.Error(w, "Unable to decrypt token", http.StatusInternalServerError)
+		return
+	}
+
+	// Check if decrypted token is in pool of valid tokens
+	val, err := redisClient.SIsMember(ctx, "tokenPool", token).Result()
 	if err != nil {
 		http.Error(w, "Unable to access redis", http.StatusInternalServerError)
 		return
@@ -140,7 +155,7 @@ func AddUserHandler(w http.ResponseWriter, r *http.Request, filePath string, red
 		return
 	}
 
-	_, err = redisClient.SRem(ctx, "tokenPool", requestToken).Result()
+	_, err = redisClient.SRem(ctx, "tokenPool", encryptedToken).Result()
 	if err != nil {
 		http.Error(w, "Unable to access redis", http.StatusInternalServerError)
 		return

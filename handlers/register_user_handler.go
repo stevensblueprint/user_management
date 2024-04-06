@@ -32,6 +32,7 @@ func RegisterUserHandler(w http.ResponseWriter, r *http.Request, configFile *koa
 		return
 	}
 
+	// Get request body
 	var userReq RegisterRequest
 	err := json.NewDecoder(r.Body).Decode(&userReq)
 	if err != nil {
@@ -57,6 +58,14 @@ func RegisterUserHandler(w http.ResponseWriter, r *http.Request, configFile *koa
 	token := utils.GenerateSecureToken(10)
 	token = utils.HashToken(token)
 
+	// Encrypts token
+	secret := configFile.String("SECRET")
+	encryptedToken, err := utils.EncryptString([]byte(secret), token)
+	if err != nil {
+		http.Error(w, "Unable to encrypt token", http.StatusInternalServerError)
+		return
+	}
+
 	// Stores token in redis
 	err = redisClient.SAdd(ctx, "tokenPool", token).Err()
 	if err != nil {
@@ -67,7 +76,7 @@ func RegisterUserHandler(w http.ResponseWriter, r *http.Request, configFile *koa
 	encodedDisplayname := strings.ReplaceAll(userDisplayname, " ", "%20")
 	baseUrl := configFile.String("BASE_URL")
 
-	url := fmt.Sprintf(baseUrl+"?displayname=%s&token=%s", encodedDisplayname, token)
+	url := fmt.Sprintf(baseUrl+"api/v1/users/register?displayname=%s&token=%s", encodedDisplayname, encryptedToken)
 
 	smtpHost := configFile.String("smtp.HOST")
 	smtpPort := configFile.String("smtp.PORT")

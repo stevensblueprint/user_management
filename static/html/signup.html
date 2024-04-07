@@ -47,25 +47,29 @@
       const url = new URL(window.location.href);
       const token = url.searchParams.get("token");
 
-      const response = await fetch("/api/v1/users/user", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          Username: username,
-          Password: password,
-          Displayname: firstName + " " + lastName,
-          Email: email,
-          Groups: ["dev"],
-        }),
-      });
+      try {
+        const response = await fetch("/api/v1/users/user", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            Username: username,
+            Password: password,
+            Displayname: firstName + " " + lastName,
+            Email: email,
+            Groups: ["dev"],
+          }),
+        });
 
-      if (response.ok) {
-        window.location.replace("http://admin.sitblueprint.com/");
-      } else {
-        console.log(response.statusText);
+        if (response.ok) {
+          window.location.replace("http://admin.sitblueprint.com/");
+        } else {
+          console.log(await response.text());
+        }
+      } catch (error) {
+        console.log(error);
       }
     });
   </script>

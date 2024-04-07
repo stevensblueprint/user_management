@@ -32,8 +32,8 @@ func init() {
 		log.Fatal("Base URL is required in config file.")
 	}
 
-	if CONFIG_FILE.String("YAML_PATH") == "" {
-		log.Fatal("YAML path is required in config file.")
+	if CONFIG_FILE.String("FILE_PATH") == "" {
+		log.Fatal("File path is required in config file.")
 	}
 
 	if CONFIG_FILE.String("SECRET") == "" {
@@ -66,7 +66,7 @@ func init() {
 }
 
 func main() {
-	YAML_PATH := CONFIG_FILE.String("YAML_PATH")
+	filePath := CONFIG_FILE.String("FILE_PATH")
 
 	redisClient := redis.NewClient(&redis.Options{
 		Addr:     CONFIG_FILE.String("redis.HOST") + ":" + CONFIG_FILE.String("redis.PORT"),
@@ -84,25 +84,26 @@ func main() {
 	mux.HandleFunc(BASE_URL+"/user", func(w http.ResponseWriter, r *http.Request) {
 		// GET /v1/users/user?username={username}
 		if r.Method == http.MethodGet {
-			handlers.GetUserHandler(w, r, YAML_PATH)
+			handlers.GetUserHandler(w, r, filePath)
 			return
 		}
 
 		// POST /v1/users/user
 		if r.Method == http.MethodPost {
-			handlers.AddUserHandler(w, r, YAML_PATH, CONFIG_FILE, redisClient, ctx)
+			secret := CONFIG_FILE.String("SECRET")
+			handlers.AddUserHandler(w, r, filePath, secret, redisClient, ctx)
 			return
 		}
 
 		// PUT /v1/users/user?username={username}
 		if r.Method == http.MethodPut {
-			handlers.UpdateUserHandler(w, r, YAML_PATH)
+			handlers.UpdateUserHandler(w, r, filePath)
 			return
 		}
 
 		// DELETE /v1/users/user?username={username}
 		if r.Method == http.MethodDelete {
-			handlers.DeleteUserHandler(w, r, YAML_PATH)
+			handlers.DeleteUserHandler(w, r, filePath)
 			return
 		}
 
@@ -117,7 +118,7 @@ func main() {
 	mux.HandleFunc(BASE_URL+"/all", func(w http.ResponseWriter, r *http.Request) {
 		// GET /v1/users/all
 		if r.Method == http.MethodGet {
-			handlers.GetAllUsersHandler(w, r, YAML_PATH)
+			handlers.GetAllUsersHandler(w, r, filePath)
 			return
 		}
 
@@ -132,7 +133,7 @@ func main() {
 	mux.HandleFunc(BASE_URL+"/user/enable", func(w http.ResponseWriter, r *http.Request) {
 		// POST /v1/users/user/enable?username={username}
 		if r.Method == http.MethodPost {
-			handlers.EnableUserRequestHandler(w, r, YAML_PATH)
+			handlers.EnableUserRequestHandler(w, r, filePath)
 			return
 		}
 
@@ -143,7 +144,7 @@ func main() {
 	mux.HandleFunc(BASE_URL+"/user/disable", func(w http.ResponseWriter, r *http.Request) {
 		// POST /v1/users/user/disable?username={username}
 		if r.Method == http.MethodPost {
-			handlers.DisableUserHandler(w, r, YAML_PATH)
+			handlers.DisableUserHandler(w, r, filePath)
 			return
 		}
 
@@ -171,7 +172,7 @@ func main() {
 	mux.HandleFunc(BASE_URL+"/reset_password", func(w http.ResponseWriter, r *http.Request) {
 		// PUT /v1/users/reset_password
 		if r.Method == http.MethodPut {
-			handlers.ResetPasswordHandler(w, r, YAML_PATH)
+			handlers.ResetPasswordHandler(w, r, filePath)
 			return
 		}
 

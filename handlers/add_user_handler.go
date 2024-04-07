@@ -12,7 +12,6 @@ import (
 	"user_management/models"
 	"user_management/utils"
 
-	"github.com/knadh/koanf/v2"
 	"github.com/redis/go-redis/v9"
 	"golang.org/x/crypto/argon2"
 	"gopkg.in/yaml.v2"
@@ -33,7 +32,7 @@ token available in the request header. If the token is in the token pool
 it will succesfully add the user to the users.yaml file. Else it will
 return a forbidden error.
 */
-func AddUserHandler(w http.ResponseWriter, r *http.Request, filePath string, configFile *koanf.Koanf, redisClient *redis.Client, ctx context.Context) {
+func AddUserHandler(w http.ResponseWriter, r *http.Request, filePath string, secret string, redisClient *redis.Client, ctx context.Context) {
 	// POST /v1/users/user
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -70,7 +69,6 @@ func AddUserHandler(w http.ResponseWriter, r *http.Request, filePath string, con
 	}
 
 	// Decrypt request token
-	secret := configFile.String("SECRET")
 	token, err := utils.DecryptString([]byte(secret), encryptedToken)
 	if err != nil {
 		http.Error(w, "Unable to decrypt token", http.StatusInternalServerError)

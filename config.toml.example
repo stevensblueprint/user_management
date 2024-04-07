@@ -1,5 +1,5 @@
 BASE_URL = ""
-YAML_PATH = "" 
+FILE_PATH = "" 
 SECRET = ""
 
 [redis]

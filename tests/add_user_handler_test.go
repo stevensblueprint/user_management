@@ -4,17 +4,17 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 	"user_management/handlers"
+	"user_management/utils"
 
-	"github.com/knadh/koanf/v2"
 	"github.com/redis/go-redis/v9"
 )
 
 func TestAddUserHandlerSuccess(t *testing.T) {
-	configFile := koanf.New(".")
 	// Connects to database 1
 	redisClient := redis.NewClient(&redis.Options{
 		Addr:     "localhost:6379",
@@ -29,11 +29,18 @@ func TestAddUserHandlerSuccess(t *testing.T) {
 		t.Fatalf(("Failed to reset database"))
 	}
 
+	// Testing variables
+	token := "token123"
+	secret := "b6fd13cc00dda2a715962dfe6ec32ad0"
+
 	// Store test token
-	err = redisClient.SAdd(ctx, "tokenPool", "token123").Err()
+	err = redisClient.SAdd(ctx, "tokenPool", token).Err()
 	if err != nil {
 		t.Fatalf(("Failed to store test token"))
 	}
+
+	// Encrypts test token
+	encryptedToken, err := utils.EncryptString([]byte(secret), token)
 
 	// Reset the test_users.yaml file
 	err = resetYAMLFile("test_users.yaml")
@@ -58,11 +65,11 @@ func TestAddUserHandlerSuccess(t *testing.T) {
 	}
 
 	// Sets authorization header
-	req.Header.Set("Authorization", "Bearer token123")
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", encryptedToken))
 
 	rr := httptest.NewRecorder()
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		handlers.AddUserHandler(w, r, "test_users.yaml", configFile, redisClient, ctx)
+		handlers.AddUserHandler(w, r, "test_users.yaml", secret, redisClient, ctx)
 	})
 
 	// Call the handler
@@ -80,7 +87,6 @@ func TestAddUserHandlerSuccess(t *testing.T) {
 }
 
 func TestAddUserHandlerInvalidMethod(t *testing.T) {
-	configFile := koanf.New(".")
 	// Connects to database 1
 	redisClient := redis.NewClient(&redis.Options{
 		Addr:     "localhost:6379",
@@ -96,8 +102,12 @@ func TestAddUserHandlerInvalidMethod(t *testing.T) {
 		t.Fatalf(("Failed to reset database"))
 	}
 
+	// Testing variables
+	token := "token123"
+	secret := "b6fd13cc00dda2a715962dfe6ec32ad0"
+
 	// Store test token
-	err = redisClient.SAdd(ctx, "tokenPool", "token123").Err()
+	err = redisClient.SAdd(ctx, "tokenPool", token).Err()
 	if err != nil {
 		t.Fatalf(("Failed to store test token"))
 	}
@@ -118,7 +128,7 @@ func TestAddUserHandlerInvalidMethod(t *testing.T) {
 
 	rr := httptest.NewRecorder()
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		handlers.AddUserHandler(w, r, "test_users.yaml", configFile, redisClient, ctx)
+		handlers.AddUserHandler(w, r, "test_users.yaml", secret, redisClient, ctx)
 	})
 
 	handler.ServeHTTP(rr, req)

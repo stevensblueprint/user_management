@@ -4,34 +4,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <title>Signup</title>
-    <link rel="stylesheet" href="/css/styles.css" />
+    <link rel="stylesheet" href="/css/signup.css" />
+    <link rel="shortcut icon" href="/logos/logo.png" />
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap"
     />
   </head>
   <body>
-    <div class="rectangle"></div>
-    <div class="logo">
-      <img src="/logos/logo_banner_negative.png" />
+    <div class="rectangle">
+      <header>
+        <div class="logo">
+          <img src="/logos/logo_banner_negative.png" />
+        </div>
+        <div class="welcome">
+          <p>Excited to have you! Let's quickly set up your account.</p>
+        </div>
+      </header>
+      <form id="input">
+        <h1>Welcome {{.Displayname}}!</h1>
+        <input type="text" id="first_name" placeholder="First Name" />
+        <input type="text" id="last_name" placeholder="Last Name" />
+        <input type="text" id="username" placeholder="Username" />
+        <input type="password" id="password" placeholder="Password" />
+        <input type="email" id="email" placeholder="Email" />
+        <button type="submit">Sign Up</button>
+      </form>
     </div>
-    <div class="welcome">
-      <p>Excited to have you! Let's quickly set up your account.</p>
-    </div>
-    <form id="form" class="input">
-      <h1>Welcome {{.Displayname}}!</h1>
-      <input type="text" id="first_name" placeholder="First Name" />
-      <input type="text" id="last_name" placeholder="Last Name" />
-      <input type="text" id="username" placeholder="Username" />
-      <input type="password" id="password" placeholder="Password" />
-      <input type="email" id="email" placeholder="Email" />
-      <button type="submit">Sign Up</button>
-    </form>
   </body>
   <script type="application/javascript">
-    const form = document.getElementById("form");
+    const input = document.getElementById("input");
 
-    form.addEventListener("submit", async (e) => {
+    input.addEventListener("submit", async (e) => {
       e.preventDefault();
 
       const firstName = document.getElementById("first_name").value.trim();

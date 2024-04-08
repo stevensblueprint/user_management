@@ -1,13 +1,15 @@
-FROM golang:1.21
+FROM golang:latest as base
 
 WORKDIR /app
 
+COPY ./go.mod ./go.sum ./
+
+RUN go mod download
+
 COPY . .
 
-RUN go mod tidy
-RUN go build -o /user_management
-ENV PATH="/var/lib/authelia-main/users.yml"
+RUN go build
+
+CMD ["./user_management"]
 
 EXPOSE 8080
-
-CMD [ "/user_management", "-prod" ]

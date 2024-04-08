@@ -14,22 +14,13 @@ git clone https://github.com/your-username/user-management-system.git
 ```
 
 2. Build the project:
-
 ```
 go build
 ```
 
-3. To run the server. Use the -dev flag to run the service in dev mode.
+3. Run the server:
 ```
-go run main.go -dev
-```
-Note: If the server is running in dev mode, then the yaml file ```users.yaml``` in the root directory will be used.
-If the server is running in prod mode, then the path to the yaml file has to be specified in a ```.env``` file
-
-## Running the service
-Run
-```
-go run main.go -dev
+./user_management
 ```
 
 ## Docs
@@ -51,12 +42,12 @@ Returns a user with provided username in url params
 ```
 POST /api/v1/users/user
 ```
-Adds user to yaml file
+Adds user to yaml file if the request contains a valid encrypted token 
 
 ```
 PUT /api/v1/users/user?username={username}
 ```
-Update a user and writes updated user to yaml file
+Updates a user and writes updated user to yaml file
 
 ```
 DELETE /api/v1/users/user?username={username}
@@ -79,10 +70,15 @@ POST /api/v1/users/user/disable?username={username}
 Sets enabled filed of user given in URL param to false
 
 ```
+GET /api/v1/users/register?displayname={displayName}?token={token}
+```
+Renders the register page for an user
+
+```
 POST /api/v1/users/register
 ```
-Creates a token to register a user and adds it to pool of valid tokens. Sends invitation to the new user
-to finish creating the account. 
+Creates a token to register a user and adds it to a pool of valid tokens stored in Redis. Sends an email invitation to the new user
+to finish creating the account
 
 ```
 PUT /api/v1/users/reset_password

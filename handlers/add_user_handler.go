@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"crypto/rand"
 	"encoding/base64"
 	"encoding/json"
@@ -9,7 +10,9 @@ import (
 	"os"
 	"strings"
 	"user_management/models"
+	"user_management/utils"
 
+	"github.com/redis/go-redis/v9"
 	"golang.org/x/crypto/argon2"
 	"gopkg.in/yaml.v2"
 )
@@ -29,17 +32,57 @@ token available in the request header. If the token is in the token pool
 it will succesfully add the user to the users.yaml file. Else it will
 return a forbidden error.
 */
-func AddUserHandler(w http.ResponseWriter, r *http.Request, filePath string) {
+func AddUserHandler(w http.ResponseWriter, r *http.Request, filePath string, secret string, redisClient *redis.Client, ctx context.Context) {
 	// POST /v1/users/user
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
+	// Get request body
 	var userReq AddUserRequest
 	err := json.NewDecoder(r.Body).Decode(&userReq)
 	if err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	// Get authorization header
+	encryptedToken := r.Header.Get("Authorization")
+	if encryptedToken == "" {
+		http.Error(w, "No authorization headers", http.StatusUnauthorized)
+		return
+	}
+
+	// Parse authorization header
+	splitToken := strings.Split(encryptedToken, "Bearer ")
+	if len(splitToken) != 2 {
+		http.Error(w, "Invalid authorization header format", http.StatusUnauthorized)
+		return
+	}
+
+	// Check if token exists
+	encryptedToken = splitToken[1]
+	if encryptedToken == "" {
+		http.Error(w, "No authorization token found", http.StatusUnauthorized)
+		return
+	}
+
+	// Decrypt request token
+	token, err := utils.DecryptString([]byte(secret), encryptedToken)
+	if err != nil {
+		http.Error(w, "Unable to decrypt token", http.StatusInternalServerError)
+		return
+	}
+
+	// Check if decrypted token is in pool of valid tokens
+	val, err := redisClient.SIsMember(ctx, "tokenPool", token).Result()
+	if err != nil {
+		http.Error(w, "Unable to access redis", http.StatusInternalServerError)
+		return
+	}
+	if !val {
+		http.Error(w, "Invalid credentials", http.StatusForbidden)
 		return
 	}
 
@@ -57,19 +100,6 @@ func AddUserHandler(w http.ResponseWriter, r *http.Request, filePath string) {
 		return
 	}
 
-	// Check if the username already exists
-	if _, exists := users.Users[userReq.Username]; exists {
-		http.Error(w, "Username already exists", http.StatusBadRequest)
-		return
-	}
-
-	// Hash password
-	hashedPassword, err := hashPassword(userReq.Password)
-	if err != nil {
-		http.Error(w, "Failed to hash password", http.StatusInternalServerError)
-		return
-	}
-
 	// Check if groups belongs to [admin, dev]
 	for _, group := range userReq.Groups {
 		if group != "admin" && group != "dev" {
@@ -81,6 +111,19 @@ func AddUserHandler(w http.ResponseWriter, r *http.Request, filePath string) {
 	// Check if email belongs to @sitblueprint.com or @stevens.edu
 	if !strings.HasSuffix(userReq.Email, "@sitblueprint.com") && !strings.HasSuffix(userReq.Email, "@stevens.edu") {
 		http.Error(w, "Invalid email", http.StatusBadRequest)
+		return
+	}
+
+	// Check if the username already exists
+	if _, exists := users.Users[userReq.Username]; exists {
+		http.Error(w, "Username already exists", http.StatusBadRequest)
+		return
+	}
+
+	// Hash password
+	hashedPassword, err := hashPassword(userReq.Password)
+	if err != nil {
+		http.Error(w, "Failed to hash password", http.StatusInternalServerError)
 		return
 	}
 
@@ -107,6 +150,12 @@ func AddUserHandler(w http.ResponseWriter, r *http.Request, filePath string) {
 	err = os.WriteFile(filePath, usersYAML, 0644)
 	if err != nil {
 		http.Error(w, "Failed to write users.yaml file", http.StatusInternalServerError)
+		return
+	}
+
+	_, err = redisClient.SRem(ctx, "tokenPool", encryptedToken).Result()
+	if err != nil {
+		http.Error(w, "Unable to access redis", http.StatusInternalServerError)
 		return
 	}
 

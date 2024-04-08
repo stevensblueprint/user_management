@@ -1,28 +1,76 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <title>PLACEHOLDER</title>
-    <link rel="stylesheet" type="text/css" href="../css/styles.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Signup</title>
+    <link rel="stylesheet" href="/css/signup.css" />
+    <link rel="shortcut icon" href="/logos/logo.png" />
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap"
     />
   </head>
   <body>
-    <div class="rectangle"></div>
-    <div class="logo">
-      <img src="../logos/logo_banner_negative.png" />
-    </div>
-    <div class="welcome">
-      <p>Excited to have you! Let's quickly set up your account.</p>
-    </div>
-    <div class="input">
-      <h1>Welcome {{.displayName}}!</h1>
-      <input type="text" id="name" placeholder="Name" />
-      <input type="text" id="last_name" placeholder="Last Name" />
-      <input type="text" id="username" placeholder="Username" />
-      <input type="email" id="email" placeholder="Email" />
-      <button>Sign Up</button>
+    <div class="rectangle">
+      <header>
+        <div class="logo">
+          <img src="/logos/logo_banner_negative.png" />
+        </div>
+        <div class="welcome">
+          <p>Excited to have you! Let's quickly set up your account.</p>
+        </div>
+      </header>
+      <form id="input">
+        <h1>Welcome {{.Displayname}}!</h1>
+        <input type="text" id="first_name" placeholder="First Name" />
+        <input type="text" id="last_name" placeholder="Last Name" />
+        <input type="text" id="username" placeholder="Username" />
+        <input type="password" id="password" placeholder="Password" />
+        <input type="email" id="email" placeholder="Email" />
+        <button type="submit">Sign Up</button>
+      </form>
     </div>
   </body>
+  <script type="application/javascript">
+    const input = document.getElementById("input");
+
+    input.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const firstName = document.getElementById("first_name").value.trim();
+      const lastName = document.getElementById("last_name").value.trim();
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const email = document.getElementById("email").value.trim();
+
+      const url = new URL(window.location.href);
+      const token = url.searchParams.get("token");
+
+      try {
+        const response = await fetch("/api/v1/users/user", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            Username: username,
+            Password: password,
+            Displayname: firstName + " " + lastName,
+            Email: email,
+            Groups: ["dev"],
+          }),
+        });
+
+        if (response.ok) {
+          window.location.replace("http://admin.sitblueprint.com/");
+        } else {
+          console.log(await response.text());
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    });
+  </script>
 </html>

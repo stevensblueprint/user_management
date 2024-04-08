@@ -1,0 +1,13 @@
+BASE_URL = ""
+FILE_PATH = "" 
+SECRET = ""
+
+[redis]
+HOST = ""
+PORT = ""
+
+[smtp]
+HOST = ""
+PORT = ""
+USERNAME = ""
+PASSWORD = ""

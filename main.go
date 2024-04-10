@@ -186,8 +186,12 @@ func main() {
 		fmt.Fprint(w, "Server is Healthy")
 	})
 
+	corsOpt := cors.Options{
+		AllowCredentials: true,
+	}
+
 	// Start the HTTP server
-	handler := cors.Default().Handler(
+	handler := cors.New(corsOpt).Handler(
 		middleware.LoggingMiddleware(mux),
 	)
 

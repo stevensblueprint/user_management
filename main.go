@@ -187,7 +187,7 @@ func main() {
 	})
 
 	corsOpt := cors.Options{
-		AllowedOrigins:   []string{"admin.sitblueprint.com"},
+		AllowedOrigins:   []string{"https://admin.sitblueprint.com"},
 		AllowCredentials: true,
 	}
 

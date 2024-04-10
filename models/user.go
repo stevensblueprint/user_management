@@ -4,6 +4,8 @@ type Users struct {
 	Users map[string]User `yaml:"users"`
 }
 
+type UserList []map[string]User
+
 type User struct {
 	Disabled    bool     `yaml:"disabled"`
 	Displayname string   `yaml:"displayname"`

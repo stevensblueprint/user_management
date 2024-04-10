@@ -31,8 +31,13 @@ func GetAllUsersHandler(w http.ResponseWriter, r *http.Request, filePath string)
 		return
 	}
 
+	userList := make(models.UserList, 0, len(users.Users))
+	for username, user := range users.Users {
+		userList = append(userList, map[string]models.User{username: user})
+	}
+
 	// Convert the users object to JSON
-	usersJSON, err := json.Marshal(users)
+	usersJSON, err := json.Marshal(userList)
 	if err != nil {
 		http.Error(w, "Failed to convert users to JSON", http.StatusInternalServerError)
 		return
